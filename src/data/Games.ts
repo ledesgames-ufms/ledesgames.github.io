@@ -33,7 +33,7 @@ export const games: Game[] = [
     longDescription: 'Uma experiência imersiva que celebra as contribuições de mulheres negras na história.',
     tags: ['Educativo', 'Cultural', 'Interativo'],
     image: museumImg,
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    videoUrl: null, // Exemplo: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
     playUrl: 'https://ledesgames.itch.io/mulheres',
     developmentDates: {
       start: 'Fevereiro 2024',
@@ -53,7 +53,7 @@ export const games: Game[] = [
     longDescription: 'Aprenda sobre o vocabulário do Pantanal enquanto se diverte com desafios de palavras.',
     tags: ['Educativo', 'Puzzle', 'Palavras'],
     image: pantanalWordImg,
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    videoUrl: null,
     playUrl: 'https://ledesgames.itch.io/pantanal',
     developmentDates: {
       start: 'Fevereiro 2024',
@@ -74,7 +74,7 @@ export const games: Game[] = [
     longDescription: 'Embarque em uma jornada épica através da mitologia grega.',
     tags: ['Aventura', 'Mitologia', 'Ação'],
     image: theseusImg,
-    videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    videoUrl: null,
     playUrl: 'https://ledesgames.itch.io/theseus',
     developmentDates: {
       start: 'Março 2025',
