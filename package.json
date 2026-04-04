@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "homepage": "https://github.com/ledesgames-ufms/ledesgames.github.io",
+  "homepage": "https://ledesgames-ufms.github.io/ledesgames.github.io/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
