@@ -1,6 +1,20 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script type="text/javascript">
+      (function(l)
+      {
+        if (l.search[1] === 'p' && l.search[2] === '=')
+        {
+          var a = document.createElement('a');
+          a.href = l.href;
+          window.history.replaceState(null, null,
+            a.pathname.slice(0, -1) + (a.search || '') + (a.hash || '')
+          );
+        }
+      }(window.location));
+    </script>
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LEDES Games - Laboratório de Jogos Digitais FACOM/UFMS</title>
