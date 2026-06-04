@@ -118,4 +118,38 @@ export const games: Game[] = [
       { name: 'Nathan Rezende', role: 'Desenvolvimento,Modelagem 3D, Ilustração, Animação' },
     ]
   },
+  {
+    id: 5,
+    title: 'Macro Planet',
+    released: false,
+    isFeatured: false, 
+    description: 'Em breve mais informações.',
+    longDescription: 'Detalhes sobre mecânicas, história e desenvolvimento.',
+    tags: ['Gerenciamento', 'Exploração'],
+    image: pantanalWorldImg,
+    videoUrl: null,
+    playUrl: '',
+    developmentDates: {
+      start: 'A definir',
+      release: 'A definir'
+    },
+    team: []
+  },
+  {
+    id: 6,
+    title: 'Moto Disaster',
+    released: false,
+    isFeatured: false, 
+    description: 'Em breve mais informações.',
+    longDescription: 'Detalhes sobre mecânicas, história e desenvolvimento.',
+    tags: ['Moto Delivery', 'Arcade'],
+    image: pantanalWorldImg,
+    videoUrl: null,
+    playUrl: '',
+    developmentDates: {
+      start: 'A definir',
+      release: 'A definir'
+    },
+    team: []
+  }
 ];
