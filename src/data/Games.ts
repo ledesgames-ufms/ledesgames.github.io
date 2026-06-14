@@ -2,6 +2,8 @@ import pantanalWorldImg from '@/assets/game-pantanal-world.jpg';
 import pantanalWordImg from '@/assets/game-pantanal-word.jpg';
 import theseusImg from '@/assets/game-theseus.jpg';
 import museumImg from '@/assets/game-museum.jpg';
+import macroPlanetImg from '@/assets/game-macro-planet.jpg';
+import motoDisasterImg from '@/assets/game-moto-disaster.jpg';
 
 export interface Game {
   id: number;
@@ -126,7 +128,7 @@ export const games: Game[] = [
     description: 'Em breve mais informações.',
     longDescription: 'Detalhes sobre mecânicas, história e desenvolvimento.',
     tags: ['Gerenciamento', 'Exploração'],
-    image: pantanalWorldImg,
+    image: macroPlanetImg,
     videoUrl: null,
     playUrl: '',
     developmentDates: {
@@ -143,7 +145,7 @@ export const games: Game[] = [
     description: 'Em breve mais informações.',
     longDescription: 'Detalhes sobre mecânicas, história e desenvolvimento.',
     tags: ['Moto Delivery', 'Arcade'],
-    image: pantanalWorldImg,
+    image: motoDisasterImg,
     videoUrl: null,
     playUrl: '',
     developmentDates: {
