@@ -1,12 +1,43 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Lightbulb, Users, Wrench } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Lightbulb, Users, Wrench, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import team1 from '@/assets/team-1.jpg';
 import team2 from '@/assets/team-2.jpg';
 import team3 from '@/assets/team-3.jpg';
+import { Dialog, DialogContent, DialogTitle, DialogHeader, DialogDescription } from '@/components/ui/dialog';
 
-const teamPhotos = [team1, team2, team3];
+interface TeamPhoto {
+  id: string;
+  src: string;
+  title: string;
+  date: string;
+  description: string;
+}
+
+const teamPhotos: TeamPhoto[] = [
+  {
+    id: 'photo-1',
+    src: team1,
+    title: 'Mini Curso Desenvolvimento de jogos 2D',
+    date: 'Agosto de 2025',
+    description: 'Aplicação do mini curso de desenvolvimento de jogos 2D feito apresentado por membros do projeto.',
+  },
+  {
+    id: 'photo-2',
+    src: team2,
+    title: 'Evento da SBGames',
+    date: 'Maio de 2025',
+    description: 'Participação no evento da SBGames para apresentar o artigo publicado.',
+  },
+  {
+    id: 'photo-3',
+    src: team3,
+    title: 'Mini Curso Desenvolvimento de jogos 2D',
+    date: 'Agosto de 2025',
+    description: 'Equipe do mini curso produzido pelo LEDES Games.',
+  }
+];
 
 const pillars = [
   {
@@ -27,15 +58,19 @@ const pillars = [
 ];
 
 const InstitutionalSection = () => {
-  const [currentPhoto, setCurrentPhoto] = useState(0);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [selectedPhoto, setSelectedPhoto] = useState<TeamPhoto | null>(null);
 
   const nextPhoto = () => {
-    setCurrentPhoto((prev) => (prev + 1) % teamPhotos.length);
+    setCurrentPhotoIndex((prev) => (prev + 1) % teamPhotos.length);
   };
 
   const prevPhoto = () => {
-    setCurrentPhoto((prev) => (prev - 1 + teamPhotos.length) % teamPhotos.length);
+    setCurrentPhotoIndex((prev) => (prev - 1 + teamPhotos.length) % teamPhotos.length);
   };
+
+   const currentPhoto = teamPhotos[currentPhotoIndex];
+
 
   return (
     <section id="about" className="py-24 bg-section-bg">
@@ -58,13 +93,23 @@ const InstitutionalSection = () => {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            <div className="relative aspect-[16/10] overflow-hidden bg-card border border-border">
+            
+            <div 
+              className="relative aspect-[16/10] overflow-hidden bg-card border border-border cursor-pointer group rounded-md"
+              onClick={() => setSelectedPhoto(currentPhoto)}
+            >
               <img
-                src={teamPhotos[currentPhoto]}
-                alt={`Equipe LEDES ${currentPhoto + 1}`}
-                className="w-full h-full object-cover"
+                src={currentPhoto.src}
+                alt={currentPhoto.title}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
+              <div className="absolute inset-0 black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                <span className="text-white font medium px-4 py-2 bg-primary/80 rounded-md backdrop-blur-sm">
+                  Clique para ver detalhes
+                </span>
+              </div>
             </div>
+
             <div className="flex items-center justify-center gap-4 mt-6">
               <Button
                 variant="outline"
@@ -78,9 +123,9 @@ const InstitutionalSection = () => {
                 {teamPhotos.map((_, index) => (
                   <button
                     key={index}
-                    onClick={() => setCurrentPhoto(index)}
+                    onClick={() => setCurrentPhotoIndex(index)}
                     className={`w-2 h-2 transition-all ${
-                      index === currentPhoto
+                      index === currentPhotoIndex
                         ? 'bg-primary w-8'
                         : 'bg-border hover:bg-primary/50'
                     }`}
@@ -146,6 +191,41 @@ const InstitutionalSection = () => {
           })}
         </div>
       </div>
+
+      <Dialog open={!!selectedPhoto} onOpenChange={(open) => !open && setSelectedPhoto((null))}>
+        <DialogContent className="max-w-5xl bg-card border-border p-0 overflow-hidden">
+          {selectedPhoto && (
+            <div className="flex flex-col md:flex-row h-full max-h-[85vh]">
+              <div className="p-6 md:p-8 flex flex-col w-full md:w-1/3 bg-muted/30 border-r border-border shirink-0">
+                <DialogHeader className="text-left mb-6">
+                  <DialogTitle className="text-2xl font-bold text-primary mb-2">
+                    {selectedPhoto.title}
+                  </DialogTitle>
+                  <DialogDescription className="flex items-center gap-22 text-foreground/70 font-medium">
+                    <Calendar className="w-4 h-4"/>
+                    {selectedPhoto.date}
+                  </DialogDescription>
+                </DialogHeader>
+                
+                <div className="text-foreground/80 leading-relaxed text-sm">
+                  {selectedPhoto.description}
+                </div>
+
+              </div>
+
+              <div className="relative flex-1 bg-black flex items-center justify-center overflow-hideen">
+                <div className="relative inline-block max-w-full max-h-full">
+                  <img
+                    src={selectedPhoto.src}
+                    alt={selectedPhoto.title}
+                    className="max-h-[85vh] w-auto object-contain"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </section>
   );
 };
