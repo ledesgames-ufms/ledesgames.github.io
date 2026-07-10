@@ -51,6 +51,15 @@ export default {
           foreground: "hsl(var(--card-foreground))",
         },
         'section-bg': "hsl(var(--section-bg))",
+
+        'preto-espacial': '#07070B',
+        'azul-petroleo': '#0B1020',
+        'roxo-atmosferico': '#4C1D95',
+        'verde-agua': '#29FFC6',
+        'verde-agua-sombra': '#119E8A',
+        'magenta-holografico': '#D946EF',
+        'branco-soft': '#F4F7FF',
+        'cinza-futurista': '#94A3B8',
       },
       backgroundImage: {
         'hero-gradient': 'linear-gradient(135deg, hsl(var(--hero-gradient-start)), hsl(var(--hero-gradient-end)))',
