@@ -14,7 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'sans-serif'],
+        sans: ['"Space Grotesk"', 'sans-serif'],
+        syne: ['Syne', 'sans-serif'],
+        pixel: ['"Pixelify Sans"', 'cursive'],
       },
       colors: {
         border: "hsl(var(--border))",
