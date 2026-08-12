@@ -1,103 +1,84 @@
 import { motion } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { Gamepad2 } from 'lucide-react';
 import { games } from '@/data/Games';
+import { HoloPrism } from '@/components/ui/holoprism';
+
+import logoLedes from '@/assets/logo_ledesgames.png'; 
 
 const HeroSection = () => {
-  const featuredGame = games.find(game => game.isFeatured) || games[0];
+  const gameImages = games.map(g => g.image).filter(Boolean);
+  
+  const fallbackImages = [
+    "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=600&q=80",
+    "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=600&q=80"
+  ];
+
+  const allImages = [...gameImages, ...fallbackImages];
 
   return (
-    <section id="hero" className="relative min-h-screen flex items-center justify-center overflow-hidden bg-preto-espacial">
+    <section id="hero" className="relative w-full h-screen flex items-center justify-center overflow-hidden bg-transparent">
       
-      <style>{`
-        @keyframes scroll-scanlines {
-          0% { background-position: 0 0; }
-          100% { background-position: 0 40px; } 
-        }
-
-        .crt-scanlines {
-          background: linear-gradient(
-            rgba(18, 16, 16, 0) 50%, 
-            rgba(0, 0, 0, 0.3) 50%
-          );
-          background-size: 100% 4px;
-          animation: scroll-scanlines 12s linear infinite;
-          pointer-events: none;
-        }
-        
-        .crt-tube-vignette {
-          background: radial-gradient(
-            circle at center,
-            transparent 50%,
-            rgba(7, 7, 11, 0.6) 85%,
-            rgba(0, 0, 0, 0.95) 100%
-          );
-          pointer-events: none;
-        }
-      `}</style>
-
-      <div className="absolute inset-0 z-0">
-        <img 
-          src={featuredGame.image}
-          alt={featuredGame.title}
-          className="w-full h-full object-cover opacity-80"
-        />
+      
+      {/* --- CUBOS DE FUNDO --- */}
+      
+      <div className="absolute top-[20%] left-[28%] z-0 hidden lg:block">
+        <HoloPrism size={90} tiltX={35} tiltZ={-15} initialAngleY={15} opacity={0.35} floatDuration={5.2} floatDelay={0.2} floatOffset={8} />
+      </div>
+      <div className="absolute top-[18%] right-[25%] z-0 hidden lg:block">
+        <HoloPrism size={100} tiltX={-40} tiltZ={20} initialAngleY={110} opacity={0.3} floatDuration={6.0} floatDelay={1.5} floatOffset={10} />
+      </div>
+      <div className="absolute bottom-[18%] left-[22%] z-0 hidden md:block">
+        <HoloPrism size={110} tiltX={-20} tiltZ={10} initialAngleY={70} opacity={0.4} floatDuration={4.8} floatDelay={0.8} floatOffset={12} />
+      </div>
+      <div className="absolute bottom-[22%] right-[20%] z-0 hidden md:block">
+        <HoloPrism size={85} tiltX={30} tiltZ={-12} initialAngleY={210} opacity={0.35} floatDuration={5.5} floatDelay={2.1} floatOffset={9} />
       </div>
 
-      <div className="absolute inset-0 z-0 mix-blend-multiply bg-preto-espacial/50" />
-      
-      <div className="absolute inset-0 z-0 crt-tube-vignette" />
-
-      <div className="absolute inset-0 z-0 crt-scanlines" />
-
-
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="relative z-10 container mx-auto px-4 flex flex-col items-center text-center mt-16"
-      >
-        <div className="inline-flex items-center gap-2 px-4 py-2 bg-azul-petroleo/80 backdrop-blur-sm border border-verde-agua/30 mb-6 rounded-md shadow-[0_0_15px_rgba(41,255,198,0.15)]">
-          <div className="w-2 h-2 bg-verde-agua rounded-full animate-pulse shadow-[0_0_5px_rgba(41,255,198,0.8)]" />
-          <span className="font-pixel text-base font-bold text-verde-agua tracking-widest uppercase mt-1">
-            EM DESTAQUE
-          </span>
-        </div>
-
-        <h1 className="font-syne text-5xl md:text-8xl font-extrabold mb-6 text-branco-soft tracking-tight drop-shadow-2xl">
-          {featuredGame.title}
-        </h1>
-
-        <div className="flex flex-wrap justify-center items-center gap-3 mb-8">
-          {featuredGame.tags.map(tag => (
-            <span key={tag} className="font-pixel px-4 py-1.5 bg-roxo-atmosferico/30 backdrop-blur-md border border-magenta-holografico/40 text-magenta-holografico text-sm font-bold rounded-md mt-1">
-              {tag}
-            </span>
-          ))}
-        </div>
-
-        <p className="font-sans text-xl md:text-2xl text-cinza-futurista mb-10 max-w-2xl font-medium drop-shadow-md">
-          {featuredGame.description}
-        </p>
-        
-        <Button size="lg" className="font-sans font-bold gap-3 text-lg px-10 py-6 bg-magenta-holografico text-branco-soft hover:bg-magenta-holografico/80 transition-colors shadow-[0_0_20px_rgba(217,70,239,0.4)]" asChild>
-          <a href={featuredGame.playUrl || "#"} target="_blank" rel="noopener noreferrer">
-            <Gamepad2 className="w-6 h-6" />
-            Jogar Agora
-          </a>
-        </Button>
-      </motion.div>
-
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10">
+      {/* --- LOGO NO CENTRO --- */}
+      <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
         <motion.div
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-          className="w-6 h-10 border-2 border-cinza-futurista/40 rounded-full flex items-start justify-center p-2 backdrop-blur-sm"
+          initial={{ opacity: 0, scale: 0.85 }} 
+          animate={{ opacity: 1, scale: 1 }} 
+          transition={{ duration: 0.8 }}
+          className="relative flex justify-center items-center pointer-events-auto"
         >
-          <div className="w-1 h-3 bg-verde-agua/70 rounded-full" />
+          <div className="absolute inset-0 bg-[#29FFC6]/20 blur-3xl rounded-full scale-90 pointer-events-none" />
+          
+          <img 
+            src={logoLedes} 
+            alt="LEDES Games Logo" 
+            className="w-48 md:w-64 lg:w-80 h-auto object-contain drop-shadow-[0_0_30px_rgba(41,255,198,0.45)] z-10 select-none"
+          />
         </motion.div>
       </div>
-      
+
+      {/* --- CUBOS PRINCIPAIS COM FOTOS --- */}
+
+      {/* --- LADO ESQUERDO --- */}
+      <div className="absolute top-[10%] left-[4%] z-10 hidden lg:block">
+        <HoloPrism image={allImages[0]} size={180} tiltX={-38} tiltZ={-10} initialAngleY={55} floatDuration={4.2} floatDelay={0.3} floatOffset={14} />
+      </div>
+      <div className="absolute top-[32%] left-[20%] z-10 hidden md:block">
+        <HoloPrism image={allImages[1]} size={230} tiltX={22} tiltZ={8} initialAngleY={-40} floatDuration={5.0} floatDelay={1.2} floatOffset={16} />
+      </div>
+      <div className="absolute bottom-[12%] left-[8%] z-10 hidden xl:block">
+        <HoloPrism image={allImages[2]} size={185} tiltX={-32} tiltZ={-12} initialAngleY={45} floatDuration={4.6} floatDelay={2.4} floatOffset={11} />
+      </div>
+
+      {/* --- LADO DIREITO --- */}
+      <div className="absolute top-[10%] right-[7%] z-10 hidden xl:block">
+        <HoloPrism image={allImages[3]} size={165} tiltX={-26} tiltZ={12} initialAngleY={-35} floatDuration={4.8} floatDelay={1.8} floatOffset={13} />
+      </div>
+      <div className="absolute top-[40%] right-[15%] z-10 hidden md:block">
+        <HoloPrism image={allImages[4]} size={230} tiltX={20} tiltZ={-8} initialAngleY={40} floatDuration={5.4} floatDelay={0.6} floatOffset={15} />
+      </div>
+      <div className="absolute bottom-[10%] right-[5%] z-10 hidden lg:block">
+        <HoloPrism image={allImages[5]} size={185} tiltX={-30} tiltZ={10} initialAngleY={-45} floatDuration={4.3} floatDelay={2.0} floatOffset={12} />
+      </div>
+
     </section>
   );
 };

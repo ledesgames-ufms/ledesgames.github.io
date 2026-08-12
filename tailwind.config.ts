@@ -14,8 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['"Space Grotesk"', 'sans-serif'],
-        syne: ['Syne', 'sans-serif'],
+        sans: ['"Rajdhani"', 'sans-serif'],
+        syne: ['"Syne"', 'sans-serif'],
+        cyber: ['"Chakra Petch"', 'sans-serif'],
         pixel: ['"Pixelify Sans"', 'cursive'],
       },
       colors: {
