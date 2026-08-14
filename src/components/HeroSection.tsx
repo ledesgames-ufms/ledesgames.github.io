@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
 import { games } from '@/data/Games';
 import { HoloPrism } from '@/components/ui/holoprism';
+import HeroWaveGrid from '@/components/ui/herowave-grid.tsx';
 
-import logoLedes from '@/assets/logo_ledesgames.png'; 
+import logoLedes from '@/assets/logo_ledesgames.png';
 
 const HeroSection = () => {
   const gameImages = games.map(g => g.image).filter(Boolean);
@@ -13,52 +14,30 @@ const HeroSection = () => {
     "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=600&q=80",
     "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80",
     "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=600&q=80"
   ];
 
   const allImages = [...gameImages, ...fallbackImages];
 
   return (
-    <section id="hero" className="relative w-full h-screen flex items-center justify-center overflow-hidden bg-transparent">
-      
-      
+    <section id="hero" className="relative min-h-screen py-32 flex items-center justify-center overflow-hidden bg-transparent">
+      <HeroWaveGrid />
+
       {/* --- CUBOS DE FUNDO --- */}
-      
-      <div className="absolute top-[20%] left-[28%] z-0 hidden lg:block">
+      <div className="absolute top-[20%] left-[28%] z-0 hidden lg:block blur-[2.5px]">
         <HoloPrism size={90} tiltX={35} tiltZ={-15} initialAngleY={15} opacity={0.35} floatDuration={5.2} floatDelay={0.2} floatOffset={8} />
       </div>
-      <div className="absolute top-[18%] right-[25%] z-0 hidden lg:block">
+      <div className="absolute top-[18%] right-[25%] z-0 hidden lg:block blur-[3px]">
         <HoloPrism size={100} tiltX={-40} tiltZ={20} initialAngleY={110} opacity={0.3} floatDuration={6.0} floatDelay={1.5} floatOffset={10} />
       </div>
-      <div className="absolute bottom-[18%] left-[22%] z-0 hidden md:block">
+      <div className="absolute bottom-[18%] left-[22%] z-0 hidden md:block blur-[2px]">
         <HoloPrism size={110} tiltX={-20} tiltZ={10} initialAngleY={70} opacity={0.4} floatDuration={4.8} floatDelay={0.8} floatOffset={12} />
       </div>
-      <div className="absolute bottom-[22%] right-[20%] z-0 hidden md:block">
+      <div className="absolute bottom-[22%] right-[20%] z-0 hidden md:block blur-[2.5px]">
         <HoloPrism size={85} tiltX={30} tiltZ={-12} initialAngleY={210} opacity={0.35} floatDuration={5.5} floatDelay={2.1} floatOffset={9} />
       </div>
 
-      {/* --- LOGO NO CENTRO --- */}
-      <div className="absolute inset-0 flex items-center justify-center z-20 pointer-events-none">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.85 }} 
-          animate={{ opacity: 1, scale: 1 }} 
-          transition={{ duration: 0.8 }}
-          className="relative flex justify-center items-center pointer-events-auto"
-        >
-          <div className="absolute inset-0 bg-[#29FFC6]/20 blur-3xl rounded-full scale-90 pointer-events-none" />
-          
-          <img 
-            src={logoLedes} 
-            alt="LEDES Games Logo" 
-            className="w-48 md:w-64 lg:w-80 h-auto object-contain drop-shadow-[0_0_30px_rgba(41,255,198,0.45)] z-10 select-none"
-          />
-        </motion.div>
-      </div>
-
-      {/* --- CUBOS PRINCIPAIS COM FOTOS --- */}
-
-      {/* --- LADO ESQUERDO --- */}
-      <div className="absolute top-[10%] left-[4%] z-10 hidden lg:block">
+      {/* --- PRISMAS HOLOGRÁFICOS - LADO ESQUERDO --- */}
+      <div className="absolute top-[18%] left-[6%] z-10 hidden lg:block">
         <HoloPrism image={allImages[0]} size={180} tiltX={-38} tiltZ={-10} initialAngleY={55} floatDuration={4.2} floatDelay={0.3} floatOffset={14} />
       </div>
       <div className="absolute top-[32%] left-[20%] z-10 hidden md:block">
@@ -68,17 +47,64 @@ const HeroSection = () => {
         <HoloPrism image={allImages[2]} size={185} tiltX={-32} tiltZ={-12} initialAngleY={45} floatDuration={4.6} floatDelay={2.4} floatOffset={11} />
       </div>
 
-      {/* --- LADO DIREITO --- */}
+      {/* --- PRISMAS HOLOGRÁFICOS - LADO DIREITO --- */}
       <div className="absolute top-[10%] right-[7%] z-10 hidden xl:block">
         <HoloPrism image={allImages[3]} size={165} tiltX={-26} tiltZ={12} initialAngleY={-35} floatDuration={4.8} floatDelay={1.8} floatOffset={13} />
       </div>
-      <div className="absolute top-[40%] right-[15%] z-10 hidden md:block">
-        <HoloPrism image={allImages[4]} size={230} tiltX={20} tiltZ={-8} initialAngleY={40} floatDuration={5.4} floatDelay={0.6} floatOffset={15} />
+      <div className="absolute top-[40%] right-[16%] z-10 hidden md:block">
+        <HoloPrism image={allImages[4] || allImages[0]} size={210} tiltX={30} tiltZ={-6} initialAngleY={50} floatDuration={5.4} floatDelay={0.7} floatOffset={18} />
       </div>
-      <div className="absolute bottom-[10%] right-[5%] z-10 hidden lg:block">
-        <HoloPrism image={allImages[5]} size={185} tiltX={-30} tiltZ={10} initialAngleY={-45} floatDuration={4.3} floatDelay={2.0} floatOffset={12} />
+      <div className="absolute bottom-[16%] right-[6%] z-10 hidden lg:block">
+        <HoloPrism image={allImages[5] || allImages[1]} size={175} tiltX={-18} tiltZ={14} initialAngleY={-60} floatDuration={4.0} floatDelay={2.0} floatOffset={12} />
       </div>
 
+      {/* --- CONTEÚDO CENTRAL --- */}
+      <div className="container mx-auto px-4 relative z-20 text-center max-w-4xl pt-12">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="flex justify-center mb-8"
+        >
+          <img
+            src={logoLedes}
+            alt="LEDES Games Logo"
+            className="w-56 sm:w-72 md:w-96 h-auto object-contain drop-shadow-[0_0_25px_rgba(41,255,198,0.4)]"
+          />
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="space-y-6"
+        >
+          <h1 className="text-4xl sm:text-6xl md:text-7xl font-syne font-extrabold text-branco-soft tracking-tight uppercase">
+            LEDES <span className="text-verde-agua drop-shadow-[0_0_12px_rgba(41,255,198,0.5)]">GAMES</span>
+          </h1>
+
+          <p className="text-cinza-futurista font-sans text-base sm:text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+            Unimos pesquisa acadêmica e design de jogos para criar experiências que ensinam, engajam e sejam memoráveis.
+          </p>
+        </motion.div>
+      </div>
+
+      {/* --- INDICADOR DE SCROLL --- */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.8 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-2 text-cinza-futurista"
+      >
+        <span className="text-xs font-pixel tracking-widest uppercase">Role para explorar</span>
+        <motion.div
+          animate={{ y: [0, 8, 0] }}
+          transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
+          className="w-5 h-8 rounded-full border-2 border-verde-agua/50 flex items-start justify-center p-1"
+        >
+          <div className="w-1 h-1.5 rounded-full bg-verde-agua" />
+        </motion.div>
+      </motion.div>
     </section>
   );
 };
