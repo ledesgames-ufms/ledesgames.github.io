@@ -1,33 +1,43 @@
 import React, { ReactNode } from 'react';
+import { useScrollColor } from '@/context/ScrollColorContext';
+
+const getFrameSvgUri = (color: string) => {
+  const encodedColor = encodeURIComponent(color);
+  const svg = `<svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M35 299.928V300H0V265H0.0722656L35 299.928ZM300 205V260H299.916L260 299.917V300H40V299.916L0.0830078 260H0V205L5 200V256.333L43.667 295H256.333L295 256.333V200L300 205ZM260 0.0839844L299.917 40H300V95L295 100V43.667L256.333 5H43.667L5 43.667V100L0 95V40H0.0839844L40 0.0830078V0H260V0.0839844ZM300 26V35H299.928L265 0.0722656V0H274L300 26ZM300 21.0508L278.949 0H300V21.0508Z" fill="${encodedColor}"/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+};
 
 export function FrameHudCiberpunk({ children }: { children: ReactNode }) {
+  const { theme } = useScrollColor();
+
   return (
-    <div className="relative p-4 group inline-block w-full">
+    <div className="relative w-full inline-block">
       
-      <div 
-        className="relative z-10 w-full h-full overflow-hidden"
+      <div
+        className="absolute inset-0 z-20 pointer-events-none transition-all duration-1000"
         style={{
-          clipPath: 'polygon(14.9% 0%, 100% 0%, 100% 78.5%, 85.7% 100%, 0% 100%, 0% 21.5%)'
+          borderStyle: 'solid',
+          borderWidth: '42px',
+          borderColor: 'transparent',
+          borderImageSource: getFrameSvgUri(theme.accent),
+          borderImageSlice: '45',
+          borderImageRepeat: 'stretch'
+        }}
+      />
+
+      <div 
+        className="relative z-10 w-full h-full overflow-hidden rounded-sm"
+        style={{
+          clipPath: 'polygon(40px 0px, calc(100% - 40px) 0px, 100% 40px, 100% calc(100% - 40px), calc(100% - 40px) 100%, 40px 100%, 0px calc(100% - 40px), 0px 40px)'
         }}
       >
-        {children}
+        <div className="w-full h-full">
+          {children}
+        </div>
       </div>
-
-      <svg 
-        className="absolute inset-0 w-full h-full text-verde-agua pointer-events-none drop-shadow-[0_0_12px_rgba(41,255,198,0.4)] z-20" 
-        preserveAspectRatio="none" 
-        viewBox="0 0 1792 1245" 
-        fill="none" 
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path 
-          fillRule="evenodd" 
-          clipRule="evenodd" 
-          d="M267.227 0H1775.61C1784.54 0 1791.78 7.25 1791.78 16.1797V976.879C1791.78 981.34 1789.97 985.391 1787.05 988.309L1535.99 1239.36C1532.83 1242.52 1528.69 1244.1 1524.56 1244.1H16.1719C7.24219 1244.1 0 1236.86 0 1227.93V267.23C0 262.77 1.8125 258.719 4.73828 255.801L255.793 4.73828C258.949 1.58984 263.086 0.0078125 267.227 0.0078125V0ZM293.457 79.5H398.68L445.836 32.3477H1759.44V550.5L1712.28 597.66V950.648L1498.33 1164.6H1393.1L1345.95 1211.76H32.3438V693.598L79.5 646.449V293.457L293.457 79.5Z" 
-          fill="currentColor" 
-        />
-      </svg>
-
+      
     </div>
   );
 }
+
+export default FrameHudCiberpunk;
