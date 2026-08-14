@@ -60,6 +60,7 @@ export default {
         'roxo-atmosferico': '#4C1D95',
         'verde-agua': '#29FFC6',
         'verde-agua-sombra': '#119E8A',
+        'verde-limao': '#3DFF5A',
         'magenta-holografico': '#D946EF',
         'branco-soft': '#F4F7FF',
         'cinza-futurista': '#94A3B8',
