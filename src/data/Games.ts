@@ -1,4 +1,4 @@
-import pantanalWorldImg from '@/assets/game-pantanal-world.jpg';
+import jurupariImg from '@/assets/game-jurupari.jpg';
 import pantanalWordImg from '@/assets/game-pantanal-word.jpg';
 import theseusImg from '@/assets/game-theseus.jpg';
 import museumImg from '@/assets/game-museum.jpg';
@@ -102,17 +102,17 @@ export const games: Game[] = [
   },
   {
     id: 4,
-    title: 'Pantanal World 3D',
+    title: 'Projeto Jurupari',
     released: false,
     isFeatured: false, 
-    description: 'Uma aventura de exploração e criatividade ambientada no vasto bioma do Pantanal.',
-    longDescription: 'Explore um mundo aberto em low poly inspirado no Pantanal brasileiro. Construa, descubra segredos e interaja com a fauna local em uma experiência sandbox única.',
-    tags: ['Sandbox', 'Exploração', 'Low Poly'],
-    image: pantanalWorldImg,
+    description: 'Um survival horror de exploração ambientado no vasto bioma do Pantanal.',
+    longDescription: 'Explore um Pantanal brasileiro assombrado pelo folclore local. Investigue, descubra segredos e interaja com a fauna local em uma experiência única.',
+    tags: ['Survival', 'Exploração', 'Terror', '3D'],
+    image: jurupariImg,
     videoUrl: null,
     playUrl: 'https://ledesgames.itch.io/pantanal3d',
     developmentDates: {
-      start: 'Agosto 2025',
+      start: 'Janeio 2026',
       release: ''
     },
     team: [
