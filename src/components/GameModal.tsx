@@ -1,17 +1,23 @@
-import { useState, useEffect } from 'react';
-import { Game } from '@/data/Games';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Play, Users, ChevronDown, ChevronUp, Gamepad2, X } from 'lucide-react';
-import { FrameHudCiberpunk } from '@/components/ui/framehud-cyberpunk';
-import { useScrollColor } from '@/context/ScrollColorContext';
+import { type CSSProperties, useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronUp, ChevronDown, Gamepad2, Play, Users, X } from "lucide-react";
+import { Game } from "@/data/Games";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { useScrollColor } from "@/context/ScrollColorContext";
 
-const getYouTubeId = (url: string | null | undefined) => {
+const getYouTubeId = (url?: string | null) => {
   if (!url) return null;
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-  const match = url.match(regExp);
-  return (match && match[2].length === 11) ? match[2] : null;
+  const match = url.match(
+    /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/,
+  );
+  return match?.[2]?.length === 11 ? match[2] : null;
+};
+
+// SVG 2 Seguro
+const getFrameSvgUri = (color: string) => {
+  const safeColor = color.replace(/[^#(),.%a-zA-Z0-9 ]/g, "");
+  const svg = `<svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M35 299.928V300H0V265H0.0722656L35 299.928ZM300 205V260H299.916L260 299.917V300H40V299.916L0.0830078 260H0V205L5 200V256.333L43.667 295H256.333L295 256.333V200L300 205ZM260 0.0839844L299.917 40H300V95L295 100V43.667L256.333 5H43.667L5 43.667V100L0 95V40H0.0839844L40 0.0830078V0H260V0.0839844ZM300 26V35H299.928L265 0.0722656V0H274L300 26ZM300 21.0508L278.949 0H300V21.0508Z" fill="${safeColor}"/></svg>`;
+  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
 };
 
 interface GameModalProps {
@@ -22,188 +28,184 @@ interface GameModalProps {
 
 const GameModal = ({ isOpen, onClose, game }: GameModalProps) => {
   const [isPlayingVideo, setIsPlayingVideo] = useState(false);
-  const [showTeamDetails, setShowTeamDetails] = useState(false);
+  const [showTeam, setShowTeam] = useState(false);
   const { theme } = useScrollColor();
 
   useEffect(() => {
-    if (isOpen) {
-      setIsPlayingVideo(false);
-      setShowTeamDetails(false);
-    }
+    setIsPlayingVideo(false);
+    setShowTeam(false);
   }, [isOpen, game]);
 
   if (!game) return null;
 
   const videoId = getYouTubeId(game.videoUrl);
+  const modalStyle = { "--accent": theme.accent } as CSSProperties;
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-2xl p-0 bg-transparent border-none shadow-none overflow-hidden [&>button]:hidden">
-        <FrameHudCiberpunk>
-          <div className="relative bg-[#07070B]/90 backdrop-blur-md p-6 sm:p-8 space-y-5 text-left max-h-[85vh] overflow-y-auto hud-scrollbar">
-            <button
-              onClick={onClose}
-              className="absolute top-4 right-4 z-50 p-2 rounded-full border bg-preto-espacial/80 hover:scale-110 transition-all"
-              style={{ borderColor: `${theme.accent}66`, color: theme.accent }}
-            >
-              <X className="w-5 h-5" />
-            </button>
+      <DialogContent
+        style={modalStyle}
+        className="h-[80vh] min-h-[500px] w-[calc(100vw-24px)] max-w-6xl overflow-hidden border-0 bg-transparent p-0 shadow-none [&>button]:hidden"
+      >
+        <DialogTitle className="sr-only">{game.title}</DialogTitle>
+        <style>{`
+          .cyber-modal-scroll::-webkit-scrollbar { width: 4px; }
+          .cyber-modal-scroll { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--accent) 55%, transparent) transparent; }
+          .cyber-modal-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,.03); }
+          .cyber-modal-scroll::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--accent) 55%, transparent); border-radius: 4px; }
+          .cyber-modal-scroll::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+        `}</style>
 
-            {/* Mídia do Jogo */}
-            <div 
-              className="relative w-full h-[240px] sm:h-[320px] rounded-lg overflow-hidden border bg-azul-petroleo group mt-2"
-              style={{ borderColor: `${theme.accent}44` }}
-            >
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98, y: 10 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          className="relative flex h-full flex-col overflow-hidden bg-[#0A0D18]/95 backdrop-blur-xl transition-colors duration-1000 shadow-[0_0_60px_rgba(0,0,0,.8)]"
+          style={{
+            borderStyle: "solid",
+            borderWidth: "32px",
+            borderImageSource: getFrameSvgUri(theme.accent),
+            borderImageSlice: "38 fill", 
+          }}
+        >
+          <button
+            type="button"
+            onClick={onClose}
+            className="absolute right-3 top-3 z-50 grid h-10 w-10 place-items-center rounded bg-[#07070B]/90 border border-[var(--accent)]/30 text-[var(--accent)] backdrop-blur-md transition hover:bg-[var(--accent)] hover:text-[#07070B]"
+          >
+            <X className="h-6 w-6" />
+          </button>
+
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
+            
+            <div className="relative shrink-0 min-h-[240px] h-[35vh] lg:h-full lg:w-[50%] overflow-hidden border-b border-white/10 bg-[#07070B] lg:border-b-0 lg:border-r" style={{ borderColor: 'color-mix(in srgb, var(--accent) 30%, transparent)' }}>
               {isPlayingVideo && videoId ? (
                 <iframe
                   src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-                  title={game.title}
-                  className="w-full h-full border-0"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  className="absolute inset-0 h-full w-full border-0"
                   allowFullScreen
                 />
               ) : (
                 <>
-                  <img src={game.image} alt={game.title} className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#07070B] via-transparent to-transparent opacity-80" />
+                  <img
+                    src={game.image}
+                    alt=""
+                    className="absolute inset-0 h-full w-full scale-110 object-cover opacity-30 blur-xl"
+                  />
+                  <div className="relative flex h-full w-full items-center justify-center p-6">
+                    <img
+                      src={game.image}
+                      alt={game.title}
+                      className="max-h-full max-w-full object-contain drop-shadow-2xl"
+                    />
+                  </div>
+                  <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#0A0D18] via-transparent to-transparent opacity-80" />
 
                   {videoId && (
-                    <button
-                      onClick={() => setIsPlayingVideo(true)}
-                      className="absolute inset-0 flex items-center justify-center bg-preto-espacial/30 hover:bg-preto-espacial/10 transition-colors"
-                    >
-                      <div
-                        className="w-14 h-14 rounded-full text-preto-espacial flex items-center justify-center transition-transform hover:scale-110"
-                        style={{ backgroundColor: theme.accent }}
-                      >
-                        <Play className="w-7 h-7 fill-current ml-1" />
-                      </div>
-                    </button>
+                     <button
+                       onClick={() => setIsPlayingVideo(true)}
+                       className="absolute inset-0 flex items-center justify-center bg-[#07070B]/30 transition-colors hover:bg-[#07070B]/10 z-20"
+                     >
+                       <div className="grid h-16 w-16 place-items-center rounded-full bg-[var(--accent)] text-[#07070B] shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_50%,transparent)] transition-transform hover:scale-105">
+                         <Play className="ml-1 h-7 w-7 fill-current" />
+                       </div>
+                     </button>
                   )}
                 </>
               )}
+            </div>
 
-              <div className="absolute top-4 left-4 z-10 flex gap-2">
-                {!game.released ? (
-                  <Badge className="bg-[#FFD600] text-preto-espacial font-bold border-0 font-pixel">
-                    EM DESENVOLVIMENTO
-                  </Badge>
+            <div className="cyber-modal-scroll flex min-h-0 flex-1 flex-col overflow-y-auto bg-[#0A0D18]/30">
+              <div className="space-y-5 p-6 lg:p-10">
+                <div>
+                  <h3 className="mb-3 font-syne text-4xl lg:text-5xl font-extrabold uppercase leading-[.95] tracking-tight text-[#F4F7FF] drop-shadow-lg">
+                    {game.title}
+                  </h3>
+                  <div className="flex flex-wrap gap-2">
+                    {game.tags?.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded border bg-[#0B1020] px-2.5 py-1 font-cyber text-[9px] uppercase tracking-widest text-[#94A3B8]"
+                        style={{ borderColor: 'color-mix(in srgb, var(--accent) 30%, transparent)' }}
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <p className="whitespace-pre-line text-base leading-7 text-[#94A3B8]">
+                  {game.longDescription || game.description}
+                </p>
+
+                <div className="pt-4">
+                  <button
+                    onClick={() => setShowTeam(!showTeam)}
+                    className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-[#07070B]/60 p-4 font-syne text-xs font-bold uppercase text-[#F4F7FF] transition hover:border-[var(--accent)]/50"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Users className="h-4 w-4 text-[var(--accent)]" /> Equipe de
+                      desenvolvimento
+                    </span>
+                    {showTeam ? (
+                      <ChevronUp className="h-4 w-4 text-[var(--accent)]" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-[var(--accent)]" />
+                    )}
+                  </button>
+                  <AnimatePresence initial={false}>
+                    {showTeam && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-2 space-y-2 rounded-lg border border-white/10 bg-[#07070B]/60 p-5">
+                          {game.team?.length ? (
+                            game.team.map((member) => (
+                              <div
+                                key={`${member.name}-${member.role}`}
+                                className="flex justify-between gap-4 border-b border-white/5 pb-3 text-sm last:border-0 last:pb-0"
+                              >
+                                <span className="font-bold text-[#F4F7FF]">
+                                  {member.name}
+                                </span>
+                                <span className="font-cyber text-[10px] uppercase tracking-wider text-[var(--accent)]">
+                                  {member.role}
+                                </span>
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-xs text-[#94A3B8]">
+                              Créditos em atualização.
+                            </p>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              </div>
+
+              <div className="mt-auto shrink-0 border-t p-6 pt-5 bg-[#07070B]/40" style={{ borderColor: 'color-mix(in srgb, var(--accent) 15%, transparent)' }}>
+                {game.playUrl ? (
+                  <a
+                    href={game.playUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex h-14 w-full items-center justify-center gap-2 rounded-lg bg-[var(--accent)] font-cyber text-[13px] font-bold uppercase tracking-[0.1em] text-[#07070B] transition hover:brightness-110 shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_30%,transparent)]"
+                  >
+                    <Gamepad2 className="h-5 w-5" /> Iniciar jogo
+                  </a>
                 ) : (
-                  <Badge
-                    className="text-preto-espacial font-bold border-0 font-pixel transition-colors duration-1000"
-                    style={{ backgroundColor: theme.accent }}
-                  >
-                    DISPONÍVEL
-                  </Badge>
-                )}
-                {game.developmentDates?.release && game.developmentDates.release !== 'A definir' && (
-                  <Badge
-                    variant="outline"
-                    className="bg-[#07070B]/80 font-cyber border"
-                    style={{ borderColor: `${theme.accent}66`, color: theme.accent }}
-                  >
-                    {game.developmentDates.release}
-                  </Badge>
+                  <div className="flex h-14 items-center justify-center rounded-lg border border-white/10 bg-white/[.02] font-cyber text-[12px] uppercase tracking-[0.1em] text-[#94A3B8]">
+                    Em desenvolvimento
+                  </div>
                 )}
               </div>
             </div>
-
-            {/* Título e Tags */}
-            <div>
-              <h3 className="text-2xl sm:text-3xl font-syne font-extrabold text-branco-soft mb-2">
-                {game.title}
-              </h3>
-              {game.tags && game.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {game.tags.map((tag, idx) => (
-                    <span
-                      key={idx}
-                      className="px-2.5 py-1 text-xs font-cyber border rounded transition-colors duration-1000"
-                      style={{
-                        borderColor: `${theme.accent}55`,
-                        color: theme.accent,
-                        backgroundColor: `${theme.accent}05`,
-                      }}
-                    >
-                      #{tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Descrição */}
-            <p className="text-cinza-futurista font-sans text-sm sm:text-base leading-relaxed">
-              {game.longDescription || game.description}
-            </p>
-
-            {/* Detalhes da Equipe */}
-            <div>
-              <button
-                onClick={() => setShowTeamDetails(!showTeamDetails)}
-                className="w-full flex items-center justify-between p-3 border rounded transition-colors duration-1000 text-left"
-                style={{
-                  borderColor: `${theme.accent}44`,
-                  backgroundColor: showTeamDetails ? `${theme.accent}15` : 'transparent',
-                }}
-              >
-                <span className="font-syne font-bold text-sm text-branco-soft flex items-center gap-2">
-                  <Users className="w-4 h-4 transition-colors duration-1000" style={{ color: theme.accent }} />
-                  EQUIPE DE DESENVOLVIMENTO
-                </span>
-                {showTeamDetails ? (
-                  <ChevronUp className="w-4 h-4" style={{ color: theme.accent }} />
-                ) : (
-                  <ChevronDown className="w-4 h-4" style={{ color: theme.accent }} />
-                )}
-              </button>
-
-              {showTeamDetails && (
-                <div
-                  className="mt-2 p-4 border rounded space-y-2 bg-[#07070B]/80 max-h-40 overflow-y-auto hud-scrollbar"
-                  style={{ borderColor: `${theme.accent}33` }}
-                >
-                  {game.team && game.team.length > 0 ? (
-                    game.team.map((member, idx) => (
-                      <div
-                        key={idx}
-                        className="flex justify-between text-xs border-b pb-1.5 last:border-0 last:pb-0 pr-2"
-                        style={{ borderColor: `${theme.accent}15` }}
-                      >
-                        <span className="text-branco-soft font-bold">{member.name}</span>
-                        <span className="italic font-cyber transition-colors duration-1000" style={{ color: theme.accent }}>
-                          {member.role}
-                        </span>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-xs text-cinza-futurista italic">Informações da equipe em atualização.</p>
-                  )}
-                </div>
-              )}
-            </div>
-
-            {/* Botão de Ação */}
-            <div className="pt-2">
-              {game.playUrl ? (
-                <a
-                  href={game.playUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center justify-center w-full gap-2 px-8 py-3 text-preto-espacial font-cyber font-bold rounded transition-colors duration-1000 hover:brightness-110"
-                  style={{ backgroundColor: theme.accent }}
-                >
-                  <Gamepad2 className="w-5 h-5" /> JOGAR AGORA
-                </a>
-              ) : (
-                <Button disabled className="w-full bg-transparent border text-cinza-futurista font-cyber" style={{ borderColor: `${theme.accent}44` }}>
-                  EM DESENVOLVIMENTO
-                </Button>
-              )}
-            </div>
-
           </div>
-        </FrameHudCiberpunk>
+        </motion.div>
       </DialogContent>
     </Dialog>
   );
