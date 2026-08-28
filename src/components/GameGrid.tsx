@@ -111,7 +111,7 @@ const GameGrid = () => {
           {viewMode === "console" ? (
             <div className="grid min-h-0 flex-1 gap-6 lg:grid-cols-[340px_minmax(0,1fr)] xl:grid-cols-[380px_minmax(0,1fr)]">
               
-              <aside className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0A0D18]/60 backdrop-blur-md transition-colors duration-1000" style={{ borderColor: 'color-mix(in srgb, var(--accent) 25%, transparent)' }}>
+              <aside className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0A0D18]/95 transition-colors duration-1000" style={{ borderColor: 'color-mix(in srgb, var(--accent) 25%, transparent)' }}>
                 <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-4 py-3" style={{ borderColor: 'color-mix(in srgb, var(--accent) 15%, transparent)' }}>
                   <span className="font-syne text-xs font-bold uppercase tracking-wide text-[#F4F7FF]">
                     Catálogo
@@ -174,7 +174,7 @@ const GameGrid = () => {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="relative hidden min-h-0 flex-col overflow-hidden bg-[#0A0D18]/80 backdrop-blur-sm lg:flex transition-colors duration-1000"
+                  className="relative hidden min-h-0 flex-col overflow-hidden bg-[#0A0D18]/95 lg:flex transition-colors duration-1000"
                   style={{
                     borderStyle: "solid",
                     borderWidth: "32px",

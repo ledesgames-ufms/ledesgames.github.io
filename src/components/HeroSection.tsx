@@ -2,20 +2,26 @@ import { motion } from 'framer-motion';
 import { games } from '@/data/Games';
 import { HoloPrism } from '@/components/ui/holoprism';
 import HeroWaveGrid from '@/components/ui/herowave-grid.tsx';
-import logoLedes from '@/assets/logo_ledesgames.png';
+import logoLedes from '@/assets/otimizadas/logo-mascote.webp';
+
+import imgMuseum from '@/assets/otimizadas/game-museum.webp';
+import imgJurupari from '@/assets/otimizadas/game-jurupari.webp';
+import imgTheseus from '@/assets/otimizadas/game-theseus.webp';
+import imgTeam3 from '@/assets/otimizadas/team-3.webp';
+import imgTeam2 from '@/assets/otimizadas/team-2.webp';
+import imgTurma2026 from '@/assets/otimizadas/turma2026.webp';
 
 const HeroSection = () => {
   const gameImages = games.map(g => g.image).filter(Boolean);
-  
-  const fallbackImages = [
-    "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=600&q=80",
-    "https://images.unsplash.com/photo-1614680376573-df3480f0c6ff?auto=format&fit=crop&w=600&q=80",
-  ];
 
-  const allImages = [...gameImages, ...fallbackImages];
+  const allImages = [
+    imgMuseum,
+    imgJurupari,
+    imgTheseus,
+    imgTeam3,
+    imgTeam2,
+    imgTurma2026,
+  ];
 
   return (
     <section id="hero" className="relative min-h-screen py-32 flex items-center justify-center overflow-hidden bg-preto-espacial">

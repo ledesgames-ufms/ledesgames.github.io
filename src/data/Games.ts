@@ -1,9 +1,9 @@
-import jurupariImg from '@/assets/game-jurupari.jpg';
-import pantanalWordImg from '@/assets/game-pantanal-word.jpg';
-import theseusImg from '@/assets/game-theseus.jpg';
-import museumImg from '@/assets/game-museum.jpg';
-import macroPlanetImg from '@/assets/game-macro-planet.jpg';
-import motoDisasterImg from '@/assets/game-moto-disaster.jpg';
+import jurupariImg from '@/assets/otimizadas/game-jurupari.webp';
+import pantanalWordImg from '@/assets/otimizadas/game-pantanal-word.webp';
+import theseusImg from '@/assets/otimizadas/game-theseus.webp';
+import museumImg from '@/assets/otimizadas/game-museum.webp';
+import macroPlanetImg from '@/assets/otimizadas/game-macro-planet.webp';
+import motoDisasterImg from '@/assets/otimizadas/game-moto-disaster.webp';
 
 export interface Game {
   id: number;

@@ -4,9 +4,9 @@ import { Lightbulb, Users, Wrench, Calendar, X, ImageIcon, Github, Linkedin, Mai
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useScrollColor } from '@/context/ScrollColorContext';
 
-import team1 from '@/assets/team-1.jpg';
-import team2 from '@/assets/team-2.jpg';
-import team3 from '@/assets/team-3.jpg';
+import team1 from '@/assets/otimizadas/turma2026.webp';
+import team2 from '@/assets/otimizadas/team-2.webp';
+import team3 from '@/assets/otimizadas/team-3.webp';
 
 const getFrameSvgUri = (color: string) => {
   const safeColor = color.replace(/[^#(),.%a-zA-Z0-9 ]/g, "");

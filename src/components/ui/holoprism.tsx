@@ -15,7 +15,6 @@ interface HoloPrismProps {
 
 type Point2D = { x: number; y: number };
 
-// Algoritmo de Envoltória Convexa (Monotone Chain) - Mais rápido e sem bugs de cantos
 function convexHull(points: Point2D[]): Point2D[] {
   const pts = [...points].sort((a, b) => a.x - b.x || a.y - b.y);
   if (pts.length <= 1) return pts;
@@ -97,7 +96,7 @@ export function HoloPrism({
         const y3 = y2 * Math.cos(radTiltX) - z2 * Math.sin(radTiltX);
         const z3 = y2 * Math.sin(radTiltX) + z2 * Math.cos(radTiltX);
 
-        // 4. Projeção de Perspectiva (A mágica que faltava para alinhar com o CSS)
+        // 4. Projeção de Perspectiva
         const perspective = 1000;
         const scale = perspective / (perspective - z3);
 
@@ -140,8 +139,6 @@ export function HoloPrism({
       animate={{ y: [0, -floatOffset, 0] }}
       transition={{ duration: floatDuration, repeat: Infinity, ease: "easeInOut", delay: floatDelay }}
     >
-      {/* CAMADA 1: Imagem plana revelada pela silhueta do cubo */}
-      {/* Removemos o overflow-hidden para permitir o vazamento da perspectiva 3D quando muito próxima */}
       {image && (
         <div
           className="absolute inset-0 z-0 pointer-events-none"
@@ -155,7 +152,6 @@ export function HoloPrism({
         </div>
       )}
 
-      {/* CAMADA 2: Gaiola 3D de Vidro Neon */}
       <div className="absolute inset-0 z-10 pointer-events-none" style={{ perspective: "1000px" }}>
         <motion.div
           ref={cubeRef}
