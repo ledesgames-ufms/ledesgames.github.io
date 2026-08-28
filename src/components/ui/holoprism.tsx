@@ -178,20 +178,20 @@ export function HoloPrism({
             {faces.map((face, index) => (
               <div
                 key={index}
-                className="absolute inset-0 border-2 border-[#29FFC6] bg-[#0B1020]/20 backdrop-blur-[1px] shadow-[0_0_15px_rgba(41,255,198,0.25)] rounded-sm overflow-hidden"
+                className="absolute inset-0 border border-[#0051ff]/50 bg-[#08080A]/60 backdrop-blur-[1px] rounded-none overflow-hidden"
                 style={{
                   transform: face.transform,
                   backfaceVisibility: "hidden",
                 }}
               >
-                {/* Cantos HUD Neon */}
-                <div className="absolute top-0 left-0 w-2.5 h-2.5 border-t-2 border-l-2 border-[#29FFC6]" />
-                <div className="absolute top-0 right-0 w-2.5 h-2.5 border-t-2 border-r-2 border-[#29FFC6]" />
-                <div className="absolute bottom-0 left-0 w-2.5 h-2.5 border-b-2 border-l-2 border-[#29FFC6]" />
-                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 border-b-2 border-r-2 border-[#29FFC6]" />
+                {/* Cantos Clean */}
+                <div className="absolute top-0 left-0 w-2 h-2 border-t border-l border-[#0051ff]" />
+                <div className="absolute top-0 right-0 w-2 h-2 border-t border-r border-[#0051ff]" />
+                <div className="absolute bottom-0 left-0 w-2 h-2 border-b border-l border-[#0051ff]" />
+                <div className="absolute bottom-0 right-0 w-2 h-2 border-b border-r border-[#0051ff]" />
 
                 {/* Brilho do vidro */}
-                <div className="absolute inset-0 bg-gradient-to-b from-[#29FFC6]/15 via-transparent to-[#29FFC6]/10 pointer-events-none" />
+                <div className="absolute inset-0 bg-gradient-to-b from-[#0051ff]/10 via-transparent to-transparent pointer-events-none" />
               </div>
             ))}
 

@@ -1,364 +1,492 @@
-import { type CSSProperties, useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  ArrowUpRight,
-  ChevronDown,
-  ChevronUp,
-  Gamepad2,
-  Grid3X3,
   Play,
+  ArrowUpRight,
+  Tv,
   Rows3,
-  Users,
-  Radio
+  Grid3X3,
+  ChevronLeft,
+  ChevronRight,
+  Gamepad2,
 } from "lucide-react";
 import { games, Game } from "@/data/Games";
-import GameModal from "./GameModal";
-import { GamesHudGrid } from "@/components/ui/gameshud-grid";
-import { useScrollColor } from "@/context/ScrollColorContext";
+import GameModal from "@/components/GameModal";
 
-const getYouTubeId = (url?: string | null) => {
-  if (!url) return null;
-  const match = url.match(
-    /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/,
-  );
-  return match?.[2]?.length === 11 ? match[2] : null;
+type ViewMode = "showcase" | "console" | "matrix";
+
+const bannerSlideVariants = {
+  enter: (dir: number) => ({
+    x: dir > 0 ? 180 : dir < 0 ? -180 : 0,
+    opacity: 0,
+    scale: 0.96,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+    scale: 1,
+    transition: {
+      x: { type: "spring", stiffness: 280, damping: 30 },
+      opacity: { duration: 0.3 },
+      scale: { duration: 0.3 }
+    }
+  },
+  exit: (dir: number) => ({
+    x: dir > 0 ? -180 : dir < 0 ? 180 : 0,
+    opacity: 0,
+    scale: 0.96,
+    transition: {
+      x: { type: "spring", stiffness: 280, damping: 30 },
+      opacity: { duration: 0.25 },
+      scale: { duration: 0.25 }
+    }
+  })
 };
 
-const getFrameSvgUri = (color: string) => {
-  const safeColor = color.replace(/[^#(),.%a-zA-Z0-9 ]/g, "");
-  const svg = `<svg width="300" height="300" viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M35 299.928V300H0V265H0.0722656L35 299.928ZM300 205V260H299.916L260 299.917V300H40V299.916L0.0830078 260H0V205L5 200V256.333L43.667 295H256.333L295 256.333V200L300 205ZM260 0.0839844L299.917 40H300V95L295 100V43.667L256.333 5H43.667L5 43.667V100L0 95V40H0.0839844L40 0.0830078V0H260V0.0839844ZM300 26V35H299.928L265 0.0722656V0H274L300 26ZM300 21.0508L278.949 0H300V21.0508Z" fill="${safeColor}"/></svg>`;
-  return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+const textSlideVariants = {
+  enter: (dir: number) => ({
+    x: dir > 0 ? 50 : dir < 0 ? -50 : 0,
+    opacity: 0,
+  }),
+  center: {
+    x: 0,
+    opacity: 1,
+    transition: { duration: 0.35, ease: "easeOut" }
+  },
+  exit: (dir: number) => ({
+    x: dir > 0 ? -50 : dir < 0 ? 50 : 0,
+    opacity: 0,
+    transition: { duration: 0.2, ease: "easeIn" }
+  })
 };
 
 const GameGrid = () => {
-  const [selectedGame, setSelectedGame] = useState<Game>(
-    () => games.find((game) => game.isFeatured) ?? games[0],
-  );
-  const [viewMode, setViewMode] = useState<"console" | "matrix">("console");
+  const [viewMode, setViewMode] = useState<ViewMode>("showcase");
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [direction, setDirection] = useState(0);
   const [modalGame, setModalGame] = useState<Game | null>(null);
-  const [isPlayingVideo, setIsPlayingVideo] = useState(false);
-  const [showTeam, setShowTeam] = useState(false);
-  const { theme } = useScrollColor();
 
-  useEffect(() => {
-    setIsPlayingVideo(false);
-    setShowTeam(false);
-  }, [selectedGame]);
+  const activeGame = games[currentIndex] || games[0];
+  const prevIndex = (currentIndex - 1 + games.length) % games.length;
+  const nextIndex = (currentIndex + 1) % games.length;
+  const prevGame = games[prevIndex];
+  const nextGame = games[nextIndex];
 
-  const openGame = (game: Game) => {
-    setSelectedGame(game);
-    if (window.innerWidth < 1024 || viewMode === "matrix") setModalGame(game);
+  const handlePrev = () => {
+    setDirection(-1);
+    setCurrentIndex(prevIndex);
   };
 
-  const selectedIndex = useMemo(
-    () => Math.max(0, games.findIndex((game) => game.id === selectedGame.id)),
-    [selectedGame]
-  );
+  const handleNext = () => {
+    setDirection(1);
+    setCurrentIndex(nextIndex);
+  };
 
-  const videoId = getYouTubeId(selectedGame.videoUrl);
-  const sectionStyle = { "--accent": theme.accent } as CSSProperties;
+  const handleDotClick = (idx: number) => {
+    if (idx === currentIndex) return;
+    setDirection(idx > currentIndex ? 1 : -1);
+    setCurrentIndex(idx);
+  };
 
   return (
     <>
       <section
         id="games"
-        style={sectionStyle}
-        className="relative min-h-[100svh] overflow-hidden bg-[#07070B] lg:h-[100svh]"
+        className="relative bg-[#0E0E12] py-28 text-white border-b border-white/10 overflow-hidden"
       >
-        <GamesHudGrid />
-
-        <style>{`
-          .cyber-scroll { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--accent) 55%, transparent) rgba(255,255,255,.05); }
-          .cyber-scroll::-webkit-scrollbar { width: 5px; }
-          .cyber-scroll::-webkit-scrollbar-track { background: rgba(255,255,255,.03); }
-          .cyber-scroll::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--accent) 55%, transparent); border-radius: 4px; }
-          .cyber-scroll::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-        `}</style>
-
-        <div className="relative z-10 mx-auto flex min-h-[100svh] w-full max-w-[1500px] flex-col px-4 pb-5 pt-24 sm:px-8 lg:h-full lg:pb-8">
+        <div className="container mx-auto px-4 lg:px-8">
           
-          <header className="mb-6 flex shrink-0 flex-col gap-4 border-b border-white/10 pb-5 md:flex-row md:items-end md:justify-between transition-colors duration-1000" style={{ borderColor: 'color-mix(in srgb, var(--accent) 25%, transparent)' }}>
-            <div className="max-w-xl">
-              <div className="mb-2 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.28em] text-white/45">
-                <Radio className="h-3 w-3 animate-pulse text-[var(--accent)] transition-colors duration-1000" />
-                CATÁLOGO DE JOGOS
+          {/* Section Header */}
+          <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+              <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-[#9999A5] mb-2">
+                <span className="w-1.5 h-1.5 bg-[#0051ff]" />
+                <span>CATÁLOGO // PRODUÇÃO DE JOGOS</span>
               </div>
-              <h2 className="font-syne text-3xl font-extrabold uppercase leading-none tracking-tight text-[#F4F7FF] sm:text-5xl lg:text-6xl">
-                Nossos <span className="text-[var(--accent)] transition-colors duration-1000">Jogos</span>
+              <h2 className="font-display text-4xl sm:text-6xl tracking-wider text-white uppercase leading-none">
+                Jogos <span className="text-[#0051ff]">Desenvolvidos</span>
               </h2>
             </div>
 
-            <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/[.03] p-1 backdrop-blur-sm transition-colors duration-1000" style={{ borderColor: 'color-mix(in srgb, var(--accent) 20%, transparent)' }}>
+            {/* View Mode Selector */}
+            <div className="flex items-center gap-1.5 border border-white/15 bg-white/[0.02] p-1">
+              <button
+                type="button"
+                onClick={() => setViewMode("showcase")}
+                className={`flex h-9 items-center gap-2 px-3.5 font-cyber text-xs uppercase tracking-wider transition-all ${
+                  viewMode === "showcase"
+                    ? "bg-[#0051ff] font-bold text-white shadow-md shadow-[#0051ff]/30"
+                    : "text-[#9999A5] hover:text-white hover:bg-white/[0.04]"
+                }`}
+                title="Modo Showcase"
+              >
+                <Tv className="h-3.5 w-3.5" />
+                <span>Showcase</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => setViewMode("console")}
-                className={`flex h-8 items-center gap-2 rounded-md px-3 font-cyber text-[10px] uppercase tracking-wider transition-colors ${viewMode === "console" ? "bg-[var(--accent)] font-bold text-[#07070B]" : "text-[#94A3B8] hover:text-white"}`}
+                className={`flex h-9 items-center gap-2 px-3.5 font-cyber text-xs uppercase tracking-wider transition-all ${
+                  viewMode === "console"
+                    ? "bg-[#0051ff] font-bold text-white shadow-md shadow-[#0051ff]/30"
+                    : "text-[#9999A5] hover:text-white hover:bg-white/[0.04]"
+                }`}
+                title="Modo Console"
               >
                 <Rows3 className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Lista</span>
+                <span>Console</span>
               </button>
+
               <button
                 type="button"
                 onClick={() => setViewMode("matrix")}
-                className={`hidden md:flex h-8 items-center gap-2 rounded-md px-3 font-cyber text-[10px] uppercase tracking-wider transition-colors ${viewMode === "matrix" ? "bg-[var(--accent)] font-bold text-[#07070B]" : "text-[#94A3B8] hover:text-white"}`}
+                className={`flex h-9 items-center gap-2 px-3.5 font-cyber text-xs uppercase tracking-wider transition-all ${
+                  viewMode === "matrix"
+                    ? "bg-[#0051ff] font-bold text-white shadow-md shadow-[#0051ff]/30"
+                    : "text-[#9999A5] hover:text-white hover:bg-white/[0.04]"
+                }`}
+                title="Modo Grade de Posters"
               >
                 <Grid3X3 className="h-3.5 w-3.5" />
-                <span className="hidden sm:inline">Grade</span>
+                <span>Posters</span>
               </button>
             </div>
           </header>
+        </div>
 
-          {viewMode === "console" ? (
-            <div className="grid min-h-0 flex-1 gap-6 lg:grid-cols-[340px_minmax(0,1fr)] xl:grid-cols-[380px_minmax(0,1fr)]">
+        {/* ========================================================================= */}
+          {/* MODO 1: SHOWCASE                                                          */}
+        {/* ========================================================================= */}
+        {viewMode === "showcase" && (
+          <div className="relative w-full overflow-hidden">
+            
+            {/* Grand Bleed Carousel Container */}
+            <div className="relative flex items-center justify-center w-full min-h-[360px] sm:min-h-[460px] md:min-h-[540px] lg:min-h-[600px]">
               
-              <aside className="flex min-h-0 flex-col overflow-hidden rounded-xl border border-white/10 bg-[#0A0D18]/60 backdrop-blur-md transition-colors duration-1000" style={{ borderColor: 'color-mix(in srgb, var(--accent) 25%, transparent)' }}>
-                <div className="flex shrink-0 items-center justify-between border-b border-white/10 px-4 py-3" style={{ borderColor: 'color-mix(in srgb, var(--accent) 15%, transparent)' }}>
-                  <span className="font-syne text-xs font-bold uppercase tracking-wide text-[#F4F7FF]">
-                    Catálogo
-                  </span>
-                  <span className="text-[11px] text-[#94A3B8]">
-                    {games.length} jogos
-                  </span>
+              {/* Central Track */}
+              <div className="flex items-center justify-center gap-3.5 sm:gap-4 lg:gap-5 w-[220vw] shrink-0 pointer-events-none">
+                
+                {/* PREVIOUS PEEK (Quase todo fora da tela, apenas ponta visível) */}
+                <div 
+                  onClick={handlePrev}
+                  className="w-[78vw] sm:w-[80vw] md:w-[82vw] max-w-6xl aspect-[16/10] sm:aspect-[21/10] md:aspect-[21/9] rounded-md overflow-hidden bg-black border border-white/15 opacity-40 hover:opacity-75 transition-opacity cursor-pointer pointer-events-auto shrink-0 shadow-2xl relative"
+                  title={`Anterior: ${prevGame.title}`}
+                >
+                  <img 
+                    src={prevGame.image} 
+                    alt={prevGame.title} 
+                    className="w-full h-full object-cover filter grayscale contrast-110"
+                  />
+                  <div className="absolute inset-0 bg-[#08080A]/60" />
                 </div>
 
-                <div className="cyber-scroll min-h-0 flex-1 space-y-1.5 overflow-y-auto p-2">
-                  {games.map((game) => {
-                    const active = game.id === selectedGame.id;
+                {/* ACTIVE GAME */}
+                <div className="w-[78vw] sm:w-[80vw] md:w-[82vw] max-w-6xl aspect-[16/10] sm:aspect-[21/10] md:aspect-[21/9] pointer-events-auto shrink-0 z-10">
+                  <AnimatePresence mode="wait" custom={direction}>
+                    <motion.div
+                      key={activeGame.id}
+                      custom={direction}
+                      variants={bannerSlideVariants}
+                      initial="enter"
+                      animate="center"
+                      exit="exit"
+                      onClick={() => setModalGame(activeGame)}
+                      className="relative w-full h-full bg-black border border-white/20 rounded-md shadow-2xl overflow-hidden cursor-pointer group"
+                    >
+                      {/* Corner Marks */}
+                      <span className="absolute top-3 left-4 font-mono text-[9px] text-[#0051ff] select-none z-20 font-bold">+ LG-0{activeGame.id}</span>
+                      <span className="absolute top-3 right-4 font-mono text-[9px] text-white/50 select-none z-20 bg-black/60 px-2 py-0.5 border border-white/10 rounded-sm">
+                        {activeGame.released ? 'ESTÁVEL // LANÇADO' : 'EM DESENVOLVIMENTO'}
+                      </span>
+
+                      <img
+                        src={activeGame.image}
+                        alt={activeGame.title}
+                        className="w-full h-full object-cover filter contrast-105 group-hover:scale-105 transition-transform duration-700"
+                      />
+
+                      {/* Vignette Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#08080A] via-transparent to-transparent opacity-80" />
+
+                      {/* Click Trigger Overlay */}
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+                        <div className="px-5 py-2.5 bg-white text-black font-cyber font-bold text-xs uppercase tracking-wider hover:bg-[#0051ff] hover:text-white transition-colors flex items-center gap-2 rounded-sm shadow-xl">
+                          <Gamepad2 className="w-4 h-4" />
+                          <span>Abrir Detalhes do Jogo</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </AnimatePresence>
+                </div>
+
+                {/* NEXT PEEK (Direita) */}
+                <div 
+                  onClick={handleNext}
+                  className="w-[78vw] sm:w-[80vw] md:w-[82vw] max-w-6xl aspect-[16/10] sm:aspect-[21/10] md:aspect-[21/9] rounded-md overflow-hidden bg-black border border-white/15 opacity-40 hover:opacity-75 transition-opacity cursor-pointer pointer-events-auto shrink-0 shadow-2xl relative"
+                  title={`Próximo: ${nextGame.title}`}
+                >
+                  <img 
+                    src={nextGame.image} 
+                    alt={nextGame.title} 
+                    className="w-full h-full object-cover filter grayscale contrast-110"
+                  />
+                  <div className="absolute inset-0 bg-[#08080A]/60" />
+                </div>
+
+              </div>
+
+              {/* Botões de Navegação */}
+              <button
+                onClick={handlePrev}
+                className="absolute left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 bg-white text-black hover:bg-[#0051ff] hover:text-white rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto active:scale-95"
+                aria-label="Jogo anterior"
+              >
+                <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+
+              <button
+                onClick={handleNext}
+                className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 bg-white text-black hover:bg-[#0051ff] hover:text-white rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto active:scale-95"
+                aria-label="Próximo jogo"
+              >
+                <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              </button>
+
+            </div>
+
+            {/* Informações do Banner */}
+            <div className="container mx-auto px-4 mt-4 sm:mt-5 text-center max-w-3xl min-h-[90px] flex flex-col justify-center">
+              <AnimatePresence mode="wait" custom={direction}>
+                <motion.div
+                  key={activeGame.id}
+                  custom={direction}
+                  variants={textSlideVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  className="space-y-2"
+                >
+                  {/* Tags */}
+                  <div className="flex flex-wrap items-center justify-center gap-2">
+                    <span className="px-2.5 py-0.5 bg-[#0051ff] text-white font-mono text-[10px] font-bold uppercase tracking-wider rounded-sm">
+                      {activeGame.released ? "LANÇADO" : "EM DESENVOLVIMENTO"}
+                    </span>
+                    {activeGame.tags.map((tag) => (
+                      <span key={tag} className="px-2.5 py-0.5 bg-white/[0.04] border border-white/10 font-mono text-[10px] text-[#9999A5] rounded-sm">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Nome */}
+                  <h3 className="font-display text-4xl sm:text-6xl text-white tracking-wider uppercase leading-none">
+                    {activeGame.title}
+                  </h3>
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Slider Navigation Dots */}
+              <div className="flex items-center justify-center gap-1.5 pt-3">
+                {games.map((_, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => handleDotClick(idx)}
+                    className={`h-1.5 transition-all duration-300 rounded-full ${
+                      idx === currentIndex ? 'w-6 bg-[#0051ff]' : 'w-2 bg-white/20 hover:bg-white/40'
+                    }`}
+                    aria-label={`Ir para jogo ${idx + 1}`}
+                  />
+                ))}
+              </div>
+
+            </div>
+
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* MODO 2: CONSOLE / LISTA TÉCNICA                                           */}
+        {/* ========================================================================= */}
+        {viewMode === "console" && (
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+              
+              {/* Left Column: Project Index */}
+              <div className="lg:col-span-5 bg-[#08080A] border border-white/15 divide-y divide-white/5 rounded-lg overflow-hidden">
+                <div className="p-4 bg-white/[0.02] border-b border-white/10 flex items-center justify-between font-mono text-[10px] text-[#9999A5] uppercase tracking-wider">
+                  <span>[ ÍNDICE DE PROJETOS ]</span>
+                  <span>TOTAL: {games.length}</span>
+                </div>
+
+                <div className="divide-y divide-white/5">
+                  {games.map((game, idx) => {
+                    const isSelected = idx === currentIndex;
                     return (
-                      <button
-                        type="button"
+                      <div
                         key={game.id}
-                        onClick={() => openGame(game)}
-                        aria-current={active ? "true" : undefined}
-                        className={`group relative flex w-full items-center gap-3 overflow-hidden rounded-lg border p-2 text-left transition-colors duration-500 ${
-                          active
-                            ? "border-[var(--accent)] bg-[color-mix(in_srgb,var(--accent)_10%,transparent)] shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_15%,transparent)]"
-                            : "border-transparent hover:border-[var(--accent)]/40 hover:bg-white/[.03]"
+                        onClick={() => setCurrentIndex(idx)}
+                        className={`p-4 flex items-center justify-between gap-3 cursor-pointer transition-all ${
+                          isSelected
+                            ? "bg-[#0051ff]/10 border-l-4 border-l-[#0051ff]"
+                            : "hover:bg-white/[0.02] border-l-4 border-l-transparent"
                         }`}
                       >
-                        {active && (
-                          <span className="absolute bottom-1 left-0 top-1 w-[3px] rounded-full bg-[var(--accent)] shadow-[0_0_8px_var(--accent)]" />
-                        )}
-                        <div className="relative h-[52px] w-[72px] shrink-0 overflow-hidden rounded-md border border-white/5 bg-black">
-                          <img
-                            src={game.image}
-                            alt=""
-                            className={`h-full w-full object-cover transition duration-500 ${active ? "scale-105" : "grayscale-[.65] group-hover:grayscale-0"}`}
-                          />
+                        <div className="flex items-center gap-3 min-w-0">
+                          <span className="font-mono text-xs text-[#0051ff] font-bold">
+                            LG-0{game.id}
+                          </span>
+                          
+                          <div className="min-w-0">
+                            <h4 className={`font-display text-lg tracking-wide uppercase truncate ${
+                              isSelected ? "text-white" : "text-[#D4D4D8]"
+                            }`}>
+                              {game.title}
+                            </h4>
+                            <div className="flex items-center gap-2 font-mono text-[10px] text-[#9999A5] truncate">
+                              <span>{game.tags.slice(0, 2).join(" // ")}</span>
+                            </div>
+                          </div>
                         </div>
-                        <div className="min-w-0">
-                          <p
-                            className={`truncate font-syne text-[13px] font-bold uppercase tracking-tight ${active ? "text-[var(--accent)]" : "text-[#B7C0CE] group-hover:text-white"}`}
-                          >
-                            {game.title}
-                          </p>
-                          <span
-                            className={`mt-1 inline-flex items-center gap-1.5 text-[10px] uppercase tracking-wide ${game.released ? "text-white/70" : "text-[#F5B23A]"}`}
-                          >
-                            <span
-                              className={`h-1.5 w-1.5 rounded-full ${game.released ? "bg-[var(--accent)]" : "bg-[#F5B23A]"}`}
-                            />
-                            {game.released ? "Disponível" : "Em desenvolvimento"}
+
+                        <div className="shrink-0">
+                          <span className={`px-2 py-0.5 font-mono text-[8px] uppercase border rounded-sm ${
+                            game.released
+                              ? "border-[#0051ff]/40 bg-[#0051ff]/10 text-[#0051ff]"
+                              : "border-white/20 bg-white/[0.02] text-[#9999A5]"
+                          }`}>
+                            {game.released ? "LANÇADO" : "EM DESENVOLVIMENTO"}
                           </span>
                         </div>
-                      </button>
+                      </div>
                     );
                   })}
                 </div>
-              </aside>
+              </div>
 
-              <AnimatePresence mode="wait">
-                <motion.article
-                  key={selectedGame.id}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.3, ease: "easeInOut" }}
-                  className="relative hidden min-h-0 flex-col overflow-hidden bg-[#0A0D18]/80 backdrop-blur-sm lg:flex transition-colors duration-1000"
-                  style={{
-                    borderStyle: "solid",
-                    borderWidth: "32px",
-                    borderImageSource: getFrameSvgUri(theme.accent),
-                    borderImageSlice: "38 fill",
-                  }}
+              {/* Right Column: Inspection Panel */}
+              <div className="lg:col-span-7 bg-[#08080A] border border-white/15 p-6 sm:p-8 space-y-6 rounded-lg">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4 font-mono text-[10px] text-[#9999A5]">
+                  <span>INSPEÇÃO TÉCNICA: LG-0{activeGame.id}</span>
+                  <span className="text-[#0051ff]">STATUS: {activeGame.released ? 'ESTÁVEL // DISPONÍVEL' : 'EM DESENVOLVIMENTO'}</span>
+                </div>
+
+                <div className="relative aspect-video bg-black overflow-hidden border border-white/10 rounded-lg">
+                  <img
+                    src={activeGame.image}
+                    alt={activeGame.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                <div>
+                  <h3 className="font-display text-3xl sm:text-4xl text-white uppercase tracking-wider mb-2">
+                    {activeGame.title}
+                  </h3>
+                  <p className="font-sans text-sm text-[#9999A5] leading-relaxed">
+                    {activeGame.longDescription || activeGame.description}
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4 border-y border-white/10 py-4 font-mono text-xs">
+                  <div>
+                    <span className="text-[#9999A5] block text-[10px] uppercase">Gênero / Tags</span>
+                    <span className="text-white font-medium">{activeGame.tags.join(", ")}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#9999A5] block text-[10px] uppercase">Período de Produção</span>
+                    <span className="text-white font-medium">{activeGame.developmentDates?.start}</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <a
+                    href={activeGame.playUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-6 py-3 bg-[#0051ff] text-white hover:bg-white hover:text-black font-cyber font-bold text-xs uppercase tracking-wider transition-colors inline-flex items-center gap-2 rounded-sm"
+                  >
+                    <Play className="w-3.5 h-3.5 fill-current" />
+                    <span>Jogar no Itch.io</span>
+                  </a>
+
+                  <button
+                    onClick={() => setModalGame(activeGame)}
+                    className="px-5 py-3 bg-white/[0.04] border border-white/20 text-white hover:border-[#0051ff] font-cyber font-bold text-xs uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 rounded-sm"
+                  >
+                    <span>Abrir Ficha Técnica</span>
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* MODO 3: POSTER MATRIX                                                     */}
+        {/* ========================================================================= */}
+        {viewMode === "matrix" && (
+          <div className="container mx-auto px-4 lg:px-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {games.map((game) => (
+                <article
+                  key={game.id}
+                  onClick={() => setModalGame(game)}
+                  className="group relative bg-[#08080A] border border-white/15 hover:border-[#0051ff] transition-all duration-300 flex flex-col justify-between overflow-hidden cursor-pointer rounded-lg shadow-lg"
                 >
-                  <div className="flex min-h-0 flex-1 overflow-hidden">
-                    <div
-                      className="relative h-full w-[42%] shrink-0 overflow-hidden border-r bg-[#07070B]"
-                      style={{ borderColor: 'color-mix(in srgb, var(--accent) 15%, transparent)' }}
-                    >
-                      {isPlayingVideo && videoId ? (
-                        <iframe
-                          src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-                          className="absolute inset-0 h-full w-full border-0"
-                          allowFullScreen
-                        />
-                      ) : (
-                        <>
-                          <img
-                            src={selectedGame.image}
-                            className="absolute inset-0 h-full w-full scale-110 object-cover opacity-30 blur-xl"
-                            alt=""
-                          />
-                          <div className="relative flex h-full w-full items-center justify-center p-6">
-                            <img
-                              src={selectedGame.image}
-                              alt={selectedGame.title}
-                              className="max-h-full max-w-full object-contain drop-shadow-2xl"
-                            />
-                          </div>
-                          <div className="absolute inset-0 z-10 bg-gradient-to-t from-[#0A0D18] via-transparent to-transparent opacity-90" />
+                  <div className="relative aspect-[16/11] overflow-hidden bg-black">
+                    <img
+                      src={game.image}
+                      alt={game.title}
+                      className="w-full h-full object-cover filter contrast-105 group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#08080A] via-transparent to-transparent opacity-80" />
 
-                          {videoId && (
-                            <button
-                              onClick={() => setIsPlayingVideo(true)}
-                              className="absolute inset-0 z-20 flex items-center justify-center bg-[#07070B]/30 transition-colors hover:bg-[#07070B]/10 group"
-                            >
-                              <div className="grid h-16 w-16 place-items-center rounded-full bg-[var(--accent)] text-[#07070B] shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_50%,transparent)] transition-transform hover:scale-105">
-                                <Play className="ml-1 h-7 w-7 fill-current" />
-                              </div>
-                            </button>
-                          )}
-                        </>
-                      )}
-                    </div>
-
-                    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-                    <div className="cyber-scroll flex-1 space-y-5 overflow-y-auto p-7 bg-[#0A0D18]/30">
-                      <div>
-                        <h3 className="mb-2 font-syne text-3xl font-extrabold uppercase leading-[.95] tracking-tight text-[#F4F7FF]">
-                          {selectedGame.title}
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                          {selectedGame.tags?.map((tag) => (
-                            <span
-                              key={tag}
-                              className="rounded border bg-[#0B1020] px-2.5 py-1 font-cyber text-[9px] uppercase tracking-widest text-[#94A3B8]"
-                              style={{ borderColor: 'color-mix(in srgb, var(--accent) 30%, transparent)' }}
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-
-                      <p className="text-[15px] leading-7 text-[#94A3B8]">
-                        {selectedGame.longDescription || selectedGame.description}
-                      </p>
-
-                      <div>
-                        <button
-                          onClick={() => setShowTeam(!showTeam)}
-                          className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-[#07070B]/50 p-3 font-syne text-xs font-bold uppercase text-[#F4F7FF] transition hover:border-[var(--accent)]/40"
-                        >
-                          <span className="flex items-center gap-2">
-                            <Users className="h-4 w-4 text-[var(--accent)]" />{" "}
-                            Equipe de desenvolvimento
-                          </span>
-                          {showTeam ? (
-                            <ChevronUp className="h-4 w-4" />
-                          ) : (
-                            <ChevronDown className="h-4 w-4" />
-                          )}
-                        </button>
-                        <AnimatePresence initial={false}>
-                          {showTeam && (
-                            <motion.div
-                              initial={{ height: 0, opacity: 0 }}
-                              animate={{ height: "auto", opacity: 1 }}
-                              exit={{ height: 0, opacity: 0 }}
-                              className="overflow-hidden"
-                            >
-                              <div className="mt-2 space-y-2 rounded-lg border border-white/10 bg-[#07070B]/50 p-4">
-                                {selectedGame.team?.length ? (
-                                  selectedGame.team.map((member) => (
-                                    <div
-                                      key={`${member.name}-${member.role}`}
-                                      className="flex justify-between gap-4 border-b border-white/5 pb-2 text-sm last:border-0 last:pb-0"
-                                    >
-                                      <span className="font-bold text-[#F4F7FF]">
-                                        {member.name}
-                                      </span>
-                                      <span className="font-cyber text-[10px] uppercase tracking-wider text-[var(--accent)]">
-                                        {member.role}
-                                      </span>
-                                    </div>
-                                  ))
-                                ) : (
-                                  <p className="text-xs text-[#94A3B8]">
-                                    Créditos em atualização.
-                                  </p>
-                                )}
-                              </div>
-                            </motion.div>
-                          )}
-                        </AnimatePresence>
-                      </div>
-                    </div>
-
-                    <div className="shrink-0 border-t p-6 bg-[#07070B]/40" style={{ borderColor: 'color-mix(in srgb, var(--accent) 15%, transparent)' }}>
-                      {selectedGame.playUrl ? (
-                        <a
-                          href={selectedGame.playUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-[var(--accent)] font-cyber text-[12px] font-bold uppercase tracking-[0.1em] text-[#07070B] transition hover:brightness-110 shadow-[0_0_15px_color-mix(in_srgb,var(--accent)_30%,transparent)]"
-                        >
-                          <Gamepad2 className="h-5 w-5" /> Jogar agora
-                        </a>
-                      ) : (
-                        <div className="flex h-12 items-center justify-center rounded-lg border border-white/10 bg-white/[.02] font-cyber text-[11px] uppercase tracking-[0.1em] text-[#94A3B8]">
-                          Em desenvolvimento
-                        </div>
-                      )}
-                    </div>
+                    <div className="absolute top-2 left-2 right-2 flex items-center justify-between font-mono text-[8px]">
+                      <span className="px-1.5 py-0.5 bg-[#0051ff] text-white font-bold rounded-sm">
+                        LG-0{game.id}
+                      </span>
+                      <span className="px-1.5 py-0.5 bg-black/70 border border-white/10 text-white/80 rounded-sm">
+                        {game.released ? "LANÇADO" : "DEV"}
+                      </span>
                     </div>
                   </div>
-                </motion.article>
-              </AnimatePresence>
-            </div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="cyber-scroll grid min-h-0 flex-1 grid-cols-1 gap-4 overflow-y-auto pr-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
-            >
-              {games.map((game) => (
-                <motion.button
-                  type="button"
-                  key={game.id}
-                  onClick={() => openGame(game)}
-                  whileHover={{ y: -4 }}
-                  className="group relative min-h-[230px] overflow-hidden rounded-xl border border-white/10 bg-white/[.02] text-left transition-colors hover:border-[var(--accent)]/50"
-                >
-                  <img
-                    src={game.image}
-                    alt={game.title}
-                    className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#07070B] via-[#07070B]/40 to-transparent opacity-90" />
 
-                  <span
-                    className={`absolute left-4 top-4 rounded-md border px-2 py-1 font-cyber text-[9px] uppercase tracking-widest ${
-                      game.released
-                        ? "border-[var(--accent)]/40 bg-[#07070B]/75 text-[var(--accent)]"
-                        : "border-[#F5B23A]/40 bg-[#07070B]/75 text-[#F5B23A]"
-                    }`}
-                  >
-                    {game.released ? "Disponível" : "Em desenvolvimento"}
-                  </span>
+                  <div className="p-4 space-y-2">
+                    <div className="flex flex-wrap gap-1">
+                      {game.tags.slice(0, 2).map((tag) => (
+                        <span key={tag} className="font-mono text-[8px] text-[#9999A5] bg-white/[0.03] px-1.5 py-0.5 border border-white/10 rounded-sm">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
 
-                  <div className="absolute bottom-0 left-0 right-0 p-5">
-                    <h3 className="font-syne text-2xl font-extrabold uppercase leading-none tracking-tight text-[#F4F7FF]">
+                    <h3 className="font-display text-2xl text-white uppercase tracking-wider group-hover:text-[#0051ff] transition-colors leading-tight truncate">
                       {game.title}
                     </h3>
+
+                    <p className="font-sans text-[11px] text-[#9999A5] line-clamp-2 leading-relaxed">
+                      {game.description}
+                    </p>
                   </div>
-                  <ArrowUpRight className="absolute bottom-5 right-5 h-5 w-5 text-[#94A3B8] transition group-hover:text-[var(--accent)]" />
-                </motion.button>
+
+                  <div className="p-4 pt-0 flex items-center justify-between border-t border-white/10 pt-3 mt-auto">
+                    <span className="font-mono text-[9px] text-[#9999A5]">
+                      {game.developmentDates?.start}
+                    </span>
+                    <span className="font-mono text-[10px] text-white group-hover:text-[#0051ff] font-bold flex items-center gap-1">
+                      <span>ABRIR</span>
+                      <ArrowUpRight className="w-3 h-3" />
+                    </span>
+                  </div>
+                </article>
               ))}
-            </motion.div>
-          )}
-        </div>
+            </div>
+          </div>
+        )}
+
       </section>
 
       <GameModal

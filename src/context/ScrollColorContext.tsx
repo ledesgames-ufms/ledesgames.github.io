@@ -9,11 +9,11 @@ export interface SectionTheme {
 }
 
 const THEMES: Record<SectionId, SectionTheme> = {
-  hero: { accent: '#29FFC6', accentGlow: 'rgba(41, 255, 198, 0.5)', bg: '#07070B' },
-  games: { accent: '#3DFF5A', accentGlow: 'rgba(61, 255, 90, 0.5)', bg: '#0B1020' },
-  research: { accent: '#00F0FF', accentGlow: 'rgba(0, 240, 255, 0.5)', bg: '#081226' },
-  about: { accent: '#29FFC6', accentGlow: 'rgba(41, 255, 198, 0.5)', bg: '#07070B' },
-  contact: { accent: '#29FFC6', accentGlow: 'rgba(41, 255, 198, 0.5)', bg: '#07070B' },
+  hero: { accent: '#0051ff', accentGlow: 'rgba(0, 81, 255, 0.25)', bg: '#08080A' },
+  games: { accent: '#0051ff', accentGlow: 'rgba(0, 81, 255, 0.25)', bg: '#08080A' },
+  research: { accent: '#0051ff', accentGlow: 'rgba(0, 81, 255, 0.25)', bg: '#08080A' },
+  about: { accent: '#0051ff', accentGlow: 'rgba(0, 81, 255, 0.25)', bg: '#08080A' },
+  contact: { accent: '#0051ff', accentGlow: 'rgba(0, 81, 255, 0.25)', bg: '#08080A' },
 };
 
 interface ScrollColorContextType {
