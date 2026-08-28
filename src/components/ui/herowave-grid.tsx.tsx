@@ -1,7 +1,29 @@
 import { useEffect, useRef } from "react";
+import { useScrollColor } from "@/context/ScrollColorContext";
+
+type Point = { x: number; y: number; opacity: number };
+
+function hexToRgb(hex: string) {
+  const clean = hex.replace("#", "");
+  const full = clean.length === 3 ? clean.split("").map((c) => c + c).join("") : clean;
+  const bigint = parseInt(full, 16);
+  return { r: (bigint >> 16) & 255, g: (bigint >> 8) & 255, b: bigint & 255 };
+}
 
 export function HeroWaveGrid() {
+  const { theme } = useScrollColor();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  
+  const targetRgbRef = useRef({ r: 41, g: 255, b: 198 });
+  const currentRgbRef = useRef({ r: 41, g: 255, b: 198 });
+
+  useEffect(() => {
+    try {
+      targetRgbRef.current = hexToRgb(theme.accent);
+    } catch {
+      // fallback
+    }
+  }, [theme.accent]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -12,51 +34,56 @@ export function HeroWaveGrid() {
     let animationFrameId: number;
     let time = 0;
 
+    let cols = 50;
+    let rows = 30;
+    let gridSpacing = 55;
+
     const resize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      
+      if (window.innerWidth < 768) {
+        cols = 24;
+        rows = 18;
+        gridSpacing = 95;
+      } else {
+        cols = 50;
+        rows = 30;
+        gridSpacing = 55;
+      }
     };
     window.addEventListener("resize", resize);
     resize();
 
-    const fov = 350;
-    const cameraY = 160;
-    const gridSpacing = 60;
-    const cols = 60;
-    const rows = 35;
+    const fov = 320;
+    const cameraY = 110;
 
-    const render = () => {
-      time += 0.0018;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      const width = canvas.width;
-      const height = canvas.height;
-      const centerX = width / 2;
-      const horizonY = height * 0.45;
-
-      const points: { x: number; y: number; opacity: number }[][] = [];
+    const projectLayer = (horizonY: number): Point[][] => {
+      const points: Point[][] = [];
+      const centerX = canvas.width / 2;
 
       for (let r = 0; r < rows; r++) {
         points[r] = [];
         const z = r * gridSpacing + 10;
         const scale = fov / z;
 
-        const zFade = Math.min(1, (z - 5) / 30);
-        const horizonFade = Math.max(0, 1 - (z / (rows * gridSpacing)));
+        const zFade = Math.min(1, (z - 5) / 25);
+        const horizonFade = Math.max(0, 1 - z / (rows * gridSpacing));
         const rowOpacity = zFade * horizonFade;
+
+        const valZ1 = 1 - Math.abs(Math.cos(z * 0.012 + time));
+        const valZ2 = 1 - Math.abs(Math.cos(z * 0.007 - time * 0.7));
 
         for (let c = 0; c < cols; c++) {
           const worldX = (c - cols / 2) * gridSpacing;
 
-          const valX1 = 1 - Math.abs(Math.sin(worldX * 0.01 + time));
-          const valZ1 = 1 - Math.abs(Math.cos(z * 0.01 + time));
-          const peak1 = Math.pow(valX1 * valZ1, 1.2);
+          const valX1 = 1 - Math.abs(Math.sin(worldX * 0.012 + time));
+          const peak1 = Math.pow(valX1 * valZ1, 1.3);
 
-          const valX2 = 1 - Math.abs(Math.sin(worldX * 0.006 - time * 0.8));
-          const valZ2 = 1 - Math.abs(Math.cos(z * 0.006 - time * 0.8));
-          const peak2 = Math.pow(valX2 * valZ2, 1.5);
+          const valX2 = 1 - Math.abs(Math.sin(worldX * 0.007 - time * 0.7));
+          const peak2 = Math.pow(valX2 * valZ2, 1.6);
 
-          const waveHeight = (peak1 * 38) + (peak2 * 22);
+          const waveHeight = peak1 * 22 + peak2 * 14;
 
           const screenX = centerX + worldX * scale;
           const screenY = horizonY + (cameraY - waveHeight) * scale;
@@ -64,58 +91,59 @@ export function HeroWaveGrid() {
           points[r][c] = { x: screenX, y: screenY, opacity: rowOpacity };
         }
       }
+      return points;
+    };
 
-      ctx.lineWidth = 0.8;
-
-      // Desenhando linhas horizontais sem brilho/shadow
-      for (let r = 0; r < rows; r++) {
-        if (!points[r] || !points[r][0] || points[r][0].opacity === 0) continue;
+    const drawLayer = (points: Point[][], r: number, g: number, b: number) => {
+      for (let ri = 0; ri < points.length; ri++) {
+        const row = points[ri];
+        if (!row || !row[0] || row[0].opacity === 0) continue;
         ctx.beginPath();
-        for (let c = 0; c < cols; c++) {
-          const pt = points[r][c];
+        for (let c = 0; c < row.length; c++) {
+          const pt = row[c];
           if (c === 0) ctx.moveTo(pt.x, pt.y);
           else ctx.lineTo(pt.x, pt.y);
         }
-        ctx.strokeStyle = `rgba(41, 255, 198, ${Math.min(0.6, points[r][0].opacity * 0.5)})`;
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, ${Math.min(0.6, row[0].opacity * 0.5)})`;
+        ctx.lineWidth = 0.8;
         ctx.stroke();
       }
 
-      // Desenhando linhas verticais sem brilho/shadow
-      for (let c = 0; c < cols; c++) {
+      const colCount = points[0]?.length ?? 0;
+      for (let c = 0; c < colCount; c++) {
         ctx.beginPath();
-        let hasMoved = false;
-        for (let r = 0; r < rows; r++) {
-          const pt = points[r][c];
+        let moved = false;
+        for (let ri = 0; ri < points.length; ri++) {
+          const pt = points[ri][c];
           if (!pt || pt.opacity === 0) continue;
-          if (!hasMoved) {
+          if (!moved) {
             ctx.moveTo(pt.x, pt.y);
-            hasMoved = true;
+            moved = true;
           } else {
             ctx.lineTo(pt.x, pt.y);
           }
         }
-        ctx.strokeStyle = `rgba(41, 255, 198, 0.18)`;
+        ctx.strokeStyle = `rgba(${r}, ${g}, ${b}, 0.18)`;
+        ctx.lineWidth = 0.8;
         ctx.stroke();
       }
+    };
 
-      // Encruzilhadas
-      for (let r = 0; r < rows; r += 2) {
-        for (let c = 0; c < cols; c += 2) {
-          const pt = points[r][c];
-          if (pt && pt.opacity > 0.15) {
-            const size = 2.5;
-            ctx.beginPath();
-            ctx.moveTo(pt.x - size, pt.y);
-            ctx.lineTo(pt.x + size, pt.y);
-            ctx.moveTo(pt.x, pt.y - size);
-            ctx.lineTo(pt.x, pt.y + size);
-            
-            ctx.strokeStyle = `rgba(41, 255, 198, ${pt.opacity * 0.7})`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-          }
-        }
-      }
+    const render = () => {
+      time += 0.0015;
+      
+      currentRgbRef.current.r += (targetRgbRef.current.r - currentRgbRef.current.r) * 0.04;
+      currentRgbRef.current.g += (targetRgbRef.current.g - currentRgbRef.current.g) * 0.04;
+      currentRgbRef.current.b += (targetRgbRef.current.b - currentRgbRef.current.b) * 0.04;
+
+      const r = Math.round(currentRgbRef.current.r);
+      const g = Math.round(currentRgbRef.current.g);
+      const b = Math.round(currentRgbRef.current.b);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const horizonY = canvas.height * 0.45;
+
+      drawLayer(projectLayer(horizonY), r, g, b);
 
       animationFrameId = requestAnimationFrame(render);
     };
@@ -129,14 +157,14 @@ export function HeroWaveGrid() {
   }, []);
 
   return (
-    <div 
-      className="absolute inset-0 z-0 overflow-hidden bg-transparent pointer-events-none"
+    <div
+      className="absolute inset-0 z-0 overflow-hidden pointer-events-none"
       style={{
-        WebkitMaskImage: "linear-gradient(to bottom, black 50%, transparent 95%)",
-        maskImage: "linear-gradient(to bottom, black 50%, transparent 95%)",
+        WebkitMaskImage: "linear-gradient(to bottom, transparent 0%, black 25%, black 85%, transparent 100%)",
+        maskImage: "linear-gradient(to bottom, transparent 0%, black 25%, black 85%, transparent 100%)",
       }}
     >
-      <canvas ref={canvasRef} className="w-full h-full block" />
+      <canvas ref={canvasRef} className="w-full h-full block opacity-70" />
     </div>
   );
 }

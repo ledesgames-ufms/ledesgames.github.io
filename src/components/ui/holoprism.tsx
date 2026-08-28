@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform, useAnimationFrame } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 
 interface HoloPrismProps {
   image?: string;
@@ -15,17 +15,7 @@ interface HoloPrismProps {
 
 type Point2D = { x: number; y: number };
 
-const CORNER_SIGNS: [number, number, number][] = [
-  [-1, -1, -1],
-  [-1, -1, 1],
-  [-1, 1, -1],
-  [-1, 1, 1],
-  [1, -1, -1],
-  [1, -1, 1],
-  [1, 1, -1],
-  [1, 1, 1],
-];
-
+// Algoritmo de Envoltória Convexa (Monotone Chain) - Mais rápido e sem bugs de cantos
 function convexHull(points: Point2D[]): Point2D[] {
   const pts = [...points].sort((a, b) => a.x - b.x || a.y - b.y);
   if (pts.length <= 1) return pts;
@@ -66,50 +56,74 @@ export function HoloPrism({
   floatDelay = 0,
   floatOffset = 12,
 }: HoloPrismProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const cornerRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [clipPathStyle, setClipPathStyle] = useState<string>("none");
-
   const { scrollYProgress } = useScroll();
+  const rotateY = useTransform(scrollYProgress, [0, 1], [initialAngleY, initialAngleY + 360]);
+  const [clipPath, setClipPath] = useState("none");
+  const cubeRef = useRef<HTMLDivElement>(null);
 
-  const cubeRotationY = useTransform(
-    scrollYProgress,
-    [0, 1],
-    [initialAngleY, initialAngleY + 360]
-  );
+  useEffect(() => {
+    let animationFrame: number;
+
+    const updateClipPath = () => {
+      if (!cubeRef.current || !image) return;
+
+      const s = size / 2;
+      
+      // 8 Vértices tridimensionais do cubo
+      const vertices = [
+        { x: -s, y: -s, z: s }, { x: s, y: -s, z: s },
+        { x: s, y: s, z: s }, { x: -s, y: s, z: s },
+        { x: -s, y: -s, z: -s }, { x: s, y: -s, z: -s },
+        { x: s, y: s, z: -s }, { x: -s, y: s, z: -s }
+      ];
+
+      const currentRotateY = rotateY.get() * (Math.PI / 180);
+      const radTiltX = tiltX * (Math.PI / 180);
+      const radTiltZ = tiltZ * (Math.PI / 180);
+
+      const projectedPoints = vertices.map((v) => {
+        // 1. Rotação Eixo Z (Framer Motion aplica de trás pra frente: Z -> Y -> X)
+        const x1 = v.x * Math.cos(radTiltZ) - v.y * Math.sin(radTiltZ);
+        const y1 = v.x * Math.sin(radTiltZ) + v.y * Math.cos(radTiltZ);
+        const z1 = v.z;
+
+        // 2. Rotação Eixo Y
+        const x2 = x1 * Math.cos(currentRotateY) + z1 * Math.sin(currentRotateY);
+        const y2 = y1;
+        const z2 = -x1 * Math.sin(currentRotateY) + z1 * Math.cos(currentRotateY);
+
+        // 3. Rotação Eixo X
+        const x3 = x2;
+        const y3 = y2 * Math.cos(radTiltX) - z2 * Math.sin(radTiltX);
+        const z3 = y2 * Math.sin(radTiltX) + z2 * Math.cos(radTiltX);
+
+        // 4. Projeção de Perspectiva (A mágica que faltava para alinhar com o CSS)
+        const perspective = 1000;
+        const scale = perspective / (perspective - z3);
+
+        const xProj = x3 * scale;
+        const yProj = y3 * scale;
+
+        // Converte para porcentagem para criar a máscara de recorte
+        return {
+          x: ((xProj + s) / size) * 100,
+          y: ((yProj + s) / size) * 100,
+        };
+      });
+
+      const hull = convexHull(projectedPoints);
+      if (hull.length >= 3) {
+        setClipPath(`polygon(${hull.map((p) => `${p.x.toFixed(2)}% ${p.y.toFixed(2)}%`).join(", ")})`);
+      }
+
+      animationFrame = requestAnimationFrame(updateClipPath);
+    };
+
+    animationFrame = requestAnimationFrame(updateClipPath);
+    return () => cancelAnimationFrame(animationFrame);
+  }, [rotateY, size, tiltX, tiltZ, image]);
 
   const halfSize = size / 2;
-
-  useAnimationFrame(() => {
-    if (!image || !containerRef.current) return;
-
-    const cRect = containerRef.current.getBoundingClientRect();
-    if (cRect.width === 0 || cRect.height === 0) return;
-
-    const points: Point2D[] = [];
-
-    for (let i = 0; i < 8; i++) {
-      const el = cornerRefs.current[i];
-      if (el) {
-        const r = el.getBoundingClientRect();
-        points.push({
-          x: r.left + r.width / 2 - cRect.left,
-          y: r.top + r.height / 2 - cRect.top,
-        });
-      }
-    }
-
-    if (points.length === 8) {
-      const hull = convexHull(points);
-      if (hull.length >= 3) {
-        const polygonStr = hull
-          .map((p) => `${p.x.toFixed(1)}px ${p.y.toFixed(1)}px`)
-          .join(", ");
-        setClipPathStyle(`polygon(${polygonStr})`);
-      }
-    }
-  });
-
   const faces = [
     { transform: `rotateY(0deg) translateZ(${halfSize}px)` },
     { transform: `rotateY(90deg) translateZ(${halfSize}px)` },
@@ -120,101 +134,48 @@ export function HoloPrism({
   ];
 
   return (
-    /* CONTAINER PRINCIPAL COM EFEITO DE FLUTUAÇÃO */
     <motion.div
-      ref={containerRef}
-      animate={{
-        y: [0, -floatOffset, 0],
-      }}
-      transition={{
-        duration: floatDuration,
-        repeat: Infinity,
-        ease: "easeInOut",
-        delay: floatDelay,
-      }}
       className="relative flex items-center justify-center pointer-events-none select-none"
-      style={{
-        width: `${size}px`,
-        height: `${size}px`,
-        opacity: opacity,
-      }}
+      style={{ width: size, height: size, opacity }}
+      animate={{ y: [0, -floatOffset, 0] }}
+      transition={{ duration: floatDuration, repeat: Infinity, ease: "easeInOut", delay: floatDelay }}
     >
-      {/* CAMADA DA IMAGEM REVELADA PELA SILHUETA DO CUBO */}
+      {/* CAMADA 1: Imagem plana revelada pela silhueta do cubo */}
+      {/* Removemos o overflow-hidden para permitir o vazamento da perspectiva 3D quando muito próxima */}
       {image && (
         <div
           className="absolute inset-0 z-0 pointer-events-none"
-          style={{
-            clipPath: clipPathStyle,
-            WebkitClipPath: clipPathStyle,
-          }}
+          style={{ clipPath }}
         >
           <img
             src={image}
-            alt="Holo Content"
+            alt=""
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[180%] h-[180%] max-w-none object-cover contrast-110"
           />
         </div>
       )}
 
-      {/* 2. ESTRUTURA 3D DO CUBO */}
-      <div
-        className="absolute inset-0 z-10 pointer-events-none"
-        style={{ perspective: "1000px" }}
-      >
-        <div
+      {/* CAMADA 2: Gaiola 3D de Vidro Neon */}
+      <div className="absolute inset-0 z-10 pointer-events-none" style={{ perspective: "1000px" }}>
+        <motion.div
+          ref={cubeRef}
           className="relative w-full h-full"
-          style={{
-            transformStyle: "preserve-3d",
-            transform: `rotateX(${tiltX}deg) rotateZ(${tiltZ}deg)`,
-          }}
+          style={{ transformStyle: "preserve-3d", rotateX: tiltX, rotateZ: tiltZ, rotateY }}
         >
-          <motion.div
-            className="relative w-full h-full"
-            style={{
-              transformStyle: "preserve-3d",
-              rotateY: cubeRotationY,
-            }}
-          >
-            {faces.map((face, index) => (
-              <div
-                key={index}
-                className="absolute inset-0 border-2 border-[#29FFC6] bg-[#0B1020]/20 backdrop-blur-[1px] shadow-[0_0_15px_rgba(41,255,198,0.25)] rounded-sm overflow-hidden"
-                style={{
-                  transform: face.transform,
-                  backfaceVisibility: "hidden",
-                }}
-              >
-                {/* Cantos HUD Neon */}
-                <div className="absolute top-0 left-0 w-2.5 h-2.5 border-t-2 border-l-2 border-[#29FFC6]" />
-                <div className="absolute top-0 right-0 w-2.5 h-2.5 border-t-2 border-r-2 border-[#29FFC6]" />
-                <div className="absolute bottom-0 left-0 w-2.5 h-2.5 border-b-2 border-l-2 border-[#29FFC6]" />
-                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 border-b-2 border-r-2 border-[#29FFC6]" />
-
-                {/* Brilho do vidro */}
-                <div className="absolute inset-0 bg-gradient-to-b from-[#29FFC6]/15 via-transparent to-[#29FFC6]/10 pointer-events-none" />
-              </div>
-            ))}
-
-            {CORNER_SIGNS.map(([sx, sy, sz], i) => (
-              <div
-                key={`corner-${i}`}
-                ref={(el) => {
-                  cornerRefs.current[i] = el;
-                }}
-                style={{
-                  position: "absolute",
-                  left: "50%",
-                  top: "50%",
-                  width: "1px",
-                  height: "1px",
-                  transform: `translate3d(${sx * halfSize}px, ${sy * halfSize}px, ${sz * halfSize}px)`,
-                  pointerEvents: "none",
-                  opacity: 0,
-                }}
-              />
-            ))}
-          </motion.div>
-        </div>
+          {faces.map((face, index) => (
+            <div
+              key={index}
+              className="absolute inset-0 border-2 border-[#29FFC6] bg-[#0B1020]/20 backdrop-blur-[1px] shadow-[0_0_15px_rgba(41,255,198,0.25)]"
+              style={{ transform: face.transform, backfaceVisibility: "hidden" }}
+            >
+              <div className="absolute top-0 left-0 w-2.5 h-2.5 border-t-2 border-l-2 border-[#29FFC6]" />
+              <div className="absolute top-0 right-0 w-2.5 h-2.5 border-t-2 border-r-2 border-[#29FFC6]" />
+              <div className="absolute bottom-0 left-0 w-2.5 h-2.5 border-b-2 border-l-2 border-[#29FFC6]" />
+              <div className="absolute bottom-0 right-0 w-2.5 h-2.5 border-b-2 border-r-2 border-[#29FFC6]" />
+              <div className="absolute inset-0 bg-gradient-to-b from-[#29FFC6]/15 via-transparent to-[#29FFC6]/10" />
+            </div>
+          ))}
+        </motion.div>
       </div>
     </motion.div>
   );
