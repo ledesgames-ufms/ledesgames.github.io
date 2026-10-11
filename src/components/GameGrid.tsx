@@ -99,10 +99,6 @@ const GameGrid = () => {
           {/* Section Header */}
           <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
-              <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-[#9999A5] mb-2">
-                <span className="w-1.5 h-1.5 bg-[#0051ff]" />
-                <span>CATÁLOGO // PRODUÇÃO DE JOGOS</span>
-              </div>
               <h2 className="font-display text-4xl sm:text-6xl tracking-wider text-white uppercase leading-none">
                 Jogos <span className="text-[#0051ff]">Desenvolvidos</span>
               </h2>
@@ -195,9 +191,8 @@ const GameGrid = () => {
                       className="relative w-full h-full bg-black border border-white/20 rounded-md shadow-2xl overflow-hidden cursor-pointer group"
                     >
                       {/* Corner Marks */}
-                      <span className="absolute top-3 left-4 font-mono text-[9px] text-[#0051ff] select-none z-20 font-bold">+ LG-0{activeGame.id}</span>
                       <span className="absolute top-3 right-4 font-mono text-[9px] text-white/50 select-none z-20 bg-black/60 px-2 py-0.5 border border-white/10 rounded-sm">
-                        {activeGame.released ? 'ESTÁVEL // LANÇADO' : 'EM DESENVOLVIMENTO'}
+                        {activeGame.released ? 'LANÇADO' : 'EM DESENVOLVIMENTO'}
                       </span>
 
                       <img
@@ -239,7 +234,7 @@ const GameGrid = () => {
               {/* Botões de Navegação */}
               <button
                 onClick={handlePrev}
-                className="absolute left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 bg-white text-black hover:bg-[#0051ff] hover:text-white rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto active:scale-95"
+                className="absolute left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:p-3 bg-black/70 border border-white/20 hover:border-[#0051ff] text-white transition-colors flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto active:scale-95"
                 aria-label="Jogo anterior"
               >
                 <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -247,7 +242,7 @@ const GameGrid = () => {
 
               <button
                 onClick={handleNext}
-                className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:h-12 bg-white text-black hover:bg-[#0051ff] hover:text-white rounded-full flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto active:scale-95"
+                className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:p-3 bg-black/70 border border-white/20 hover:border-[#0051ff] text-white transition-colors flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto active:scale-95"
                 aria-label="Próximo jogo"
               >
                 <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -333,9 +328,6 @@ const GameGrid = () => {
                         }`}
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <span className="font-mono text-xs text-[#0051ff] font-bold">
-                            LG-0{game.id}
-                          </span>
                           
                           <div className="min-w-0">
                             <h4 className={`font-display text-lg tracking-wide uppercase truncate ${
@@ -445,9 +437,6 @@ const GameGrid = () => {
                     <div className="absolute inset-0 bg-gradient-to-t from-[#08080A] via-transparent to-transparent opacity-80" />
 
                     <div className="absolute top-2 left-2 right-2 flex items-center justify-between font-mono text-[8px]">
-                      <span className="px-1.5 py-0.5 bg-[#0051ff] text-white font-bold rounded-sm">
-                        LG-0{game.id}
-                      </span>
                       <span className="px-1.5 py-0.5 bg-black/70 border border-white/10 text-white/80 rounded-sm">
                         {game.released ? "LANÇADO" : "DEV"}
                       </span>

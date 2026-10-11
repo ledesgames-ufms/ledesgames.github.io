@@ -56,16 +56,6 @@ const Header = () => {
               <span className="absolute -bottom-1 -right-1 w-1.5 h-1.5 bg-[#0051ff]" />
             </div>
 
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2">
-                <span className="font-display text-xl tracking-wider text-white">
-                  LEDES <span className="text-[#0051ff]">GAMES</span>
-                </span>
-              </div>
-              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#9999A5]">
-                FACOM // UFMS STUDIO
-              </span>
-            </div>
           </div>
 
           {/* Desktop Navigation */}
@@ -76,9 +66,6 @@ const Header = () => {
                 onClick={() => scrollToSection(item.id)}
                 className="group relative px-4 py-2 flex items-center gap-1.5 font-cyber text-xs uppercase tracking-wider text-[#9999A5] hover:text-white transition-colors"
               >
-                <span className="font-mono text-[9px] text-[#0051ff] opacity-70 group-hover:opacity-100 transition-opacity">
-                  {item.index}.
-                </span>
                 <span>{item.label}</span>
                 <span className="absolute bottom-0 left-4 right-4 h-[2px] bg-[#0051ff] scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
               </button>
@@ -87,12 +74,6 @@ const Header = () => {
 
           {/* Right Action / Status Bar */}
           <div className="hidden sm:flex items-center gap-4">
-            <div className="hidden xl:flex items-center gap-2 px-3 py-1.5 border border-white/10 bg-white/[0.02] font-mono text-[10px] text-[#9999A5]">
-              <span className="w-2 h-2 rounded-full bg-[#0051ff] animate-pulse" />
-              <span className="text-white font-medium">LAB ONLINE</span>
-              <span className="text-white/30">|</span>
-              <span>2026.SYS</span>
-            </div>
 
             <button
               onClick={() => scrollToSection('games')}

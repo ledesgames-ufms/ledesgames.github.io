@@ -70,17 +70,6 @@ const HeroSection = () => {
         <div className="absolute inset-0 bg-radial from-transparent via-[#08080A]/70 to-[#08080A]" />
       </div>
 
-      {/* Decorative Corner HUD Elements */}
-      <div className="absolute top-24 left-6 hidden lg:block font-mono text-[10px] text-white/30 tracking-[0.25em] select-none z-10">
-        <p>[SYS.STATUS: ONLINE]</p>
-        <p>LAB: FACOM // UFMS</p>
-      </div>
-
-      <div className="absolute top-24 right-6 hidden lg:block font-mono text-[10px] text-right text-white/30 tracking-[0.25em] select-none z-10">
-        <p>COORD: 20°30'18"S 54°36'48"W</p>
-        <p>[SECTOR: GAME_RESEARCH]</p>
-      </div>
-
       {/* ========================================================================= */}
       {/* Main Studio Hero Content                                                  */}
       {/* ========================================================================= */}
@@ -107,10 +96,6 @@ const HeroSection = () => {
 
               {/* Título do Prisma */}
               <div className="absolute -bottom-3 -right-3 z-30 bg-[#0E0E12]/95 border border-white/20 backdrop-blur-md px-3 py-1.5 shadow-2xl">
-                <div className="flex items-center gap-1.5 font-mono text-[8px] text-[#0051ff] font-bold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#0051ff] animate-pulse" />
-                  <span>LG-0{currentGame.id} // JOGO</span>
-                </div>
                 <p className="font-display text-sm uppercase text-white tracking-wider truncate max-w-[130px] leading-tight">
                   {currentGame.title}
                 </p>
@@ -172,10 +157,6 @@ const HeroSection = () => {
 
               {/* Título do Prisma */}
               <div className="absolute -bottom-3 -left-3 z-30 bg-[#0E0E12]/95 border border-white/20 backdrop-blur-md px-3 py-1.5 shadow-2xl">
-                <div className="flex items-center gap-1.5 font-mono text-[8px] text-white/80 font-bold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white/70 animate-pulse" />
-                  <span>FACOM // {currentPhoto.tag}</span>
-                </div>
                 <p className="font-display text-sm uppercase text-white tracking-wider truncate max-w-[130px] leading-tight">
                   {currentPhoto.title}
                 </p>
@@ -189,27 +170,6 @@ const HeroSection = () => {
         {/* TEXTO PRINCIPAL                                                           */}
         {/* ========================================================================= */}
         <div className="text-center max-w-4xl mx-auto space-y-4 mt-2">
-          
-          {/* Badge de Estúdio */}
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="inline-flex items-center gap-2 px-3.5 py-1 bg-white/[0.03] border border-white/10 font-mono text-[11px] uppercase tracking-wider text-white/80"
-          >
-            <Terminal className="w-3.5 h-3.5 text-[#0051ff]" />
-            <span>LABORATÓRIO DE DESENVOLVIMENTO DE JOGOS // FACOM UFMS</span>
-          </motion.div>
-
-          {/* Título */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-display text-5xl sm:text-7xl md:text-8xl tracking-wider uppercase text-white leading-[0.9]"
-          >
-            CRIANDO JOGOS COM <span className="text-[#0051ff]">CIÊNCIA</span>
-          </motion.h1>
 
           {/* Parágrafo de Apresentação */}
           <motion.p
@@ -248,33 +208,7 @@ const HeroSection = () => {
         </div>
       </div>
 
-      {/* ========================================================================= */}
-      {/* MÉTRICAS + INDICADOR DE SCROLL                            */}
-      {/* ========================================================================= */}
-      <div className="container mx-auto px-4 lg:px-8 relative z-10 pt-6">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto border-t border-white/10 pt-6">
-          <div className="text-center md:text-left">
-            <span className="font-display text-3xl sm:text-4xl text-white tracking-wider block">05+</span>
-            <span className="font-mono text-[10px] uppercase tracking-wider text-[#9999A5]">Jogos Autorais</span>
-          </div>
-
-          <div className="text-center md:text-left">
-            <span className="font-display text-3xl sm:text-4xl text-[#0051ff] tracking-wider block">2+</span>
-            <span className="font-mono text-[10px] uppercase tracking-wider text-[#9999A5]">Publicações</span>
-          </div>
-
-          <div className="text-center md:text-left">
-            <span className="font-display text-3xl sm:text-4xl text-white tracking-wider block">100%</span>
-            <span className="font-mono text-[10px] uppercase tracking-wider text-[#9999A5]">Open Research</span>
-          </div>
-
-          <div className="text-center md:text-left">
-            <span className="font-display text-3xl sm:text-4xl text-white tracking-wider block">LEDES</span>
-            <span className="font-mono text-[10px] uppercase tracking-wider text-[#9999A5]">Lab Oficial UFMS</span>
-          </div>
-        </div>
-
-        {/* Scroll Indicator */}
+      {/* Scroll Indicator */}
         <div className="flex justify-center pt-6">
           <button 
             onClick={() => scrollToSection('games')}
@@ -285,7 +219,6 @@ const HeroSection = () => {
             <ArrowDown className="w-4 h-4 animate-bounce text-[#0051ff]" />
           </button>
         </div>
-      </div>
 
     </section>
   );

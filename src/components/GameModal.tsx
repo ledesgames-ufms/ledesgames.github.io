@@ -53,14 +53,6 @@ const GameModal = ({ isOpen, onClose, game }: GameModalProps) => {
           {/* Modal Header Bar */}
           <div className="flex items-center justify-between px-6 py-4 bg-[#0E0E14] border-b border-white/10 shrink-0">
             <div className="flex items-center gap-3">
-              <span className="w-2 h-2 bg-[#0051ff]" />
-              <span className="font-mono text-xs text-white uppercase tracking-widest">
-                FICHA TÉCNICA // LG-0{game.id}
-              </span>
-              <span className="text-white/30 hidden sm:inline">|</span>
-              <span className="font-mono text-[10px] text-[#9999A5] uppercase hidden sm:inline">
-                FACOM.UFMS ARCHIVE
-              </span>
             </div>
 
             <button

@@ -1,5 +1,7 @@
+import { type CSSProperties } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MapPin, Instagram, Youtube, ArrowUpRight, Radio } from 'lucide-react';
+import { Mail, MapPin, Instagram, Youtube, Radio, ArrowUpRight } from 'lucide-react';
+import { useScrollColor } from '@/context/ScrollColorContext';
 
 const mediaCards = [
   {
@@ -45,33 +47,41 @@ const mediaCards = [
 ];
 
 const MediaSection = () => {
+  const { theme } = useScrollColor();
+  const sectionStyle = { "--accent": theme.accent } as CSSProperties;
+
   return (
-    <section id="media" className="relative py-28 bg-[#0051ff] text-white overflow-hidden">
+    <section id="media" style={sectionStyle} className="relative py-20 lg:py-24 bg-[#07070B] transition-colors duration-1000 overflow-hidden">
       
-      <div className="container mx-auto px-4 lg:px-8 max-w-7xl relative z-10">
+      <div className="absolute top-0 left-0 w-full h-[1px] opacity-30 transition-colors duration-1000" style={{ background: `linear-gradient(to right, transparent, var(--accent), transparent)` }} />
+
+      <div 
+        className="absolute inset-0 z-0 pointer-events-none transition-colors duration-1000 opacity-[0.15]"
+        style={{
+          backgroundImage: `linear-gradient(to right, var(--accent) 1px, transparent 1px), linear-gradient(to bottom, var(--accent) 1px, transparent 1px)`,
+          backgroundSize: '60px 60px',
+          maskImage: 'linear-gradient(to bottom, transparent, black 50%, black 90%, transparent)'
+        }}
+      />
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,#07070B_80%)] z-0 pointer-events-none" />
+
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         
-        {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="mb-16 text-center max-w-3xl mx-auto"
+          className="flex flex-col items-center text-center mb-12 md:mb-16"
         >
-          <div className="inline-flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-white/80 mb-2">
-            <Radio className="w-3.5 h-3.5 text-white animate-pulse" />
-            <span>CANAIS & CONEXÕES // LEDES GAMES</span>
-          </div>
-
           <h2 className="font-display text-4xl sm:text-6xl uppercase tracking-wider text-white leading-none">
             Conecte-se com o Estúdio
           </h2>
           <p className="text-white/90 font-sans text-base mt-3 leading-relaxed">
-            Encontre-nos no campus da FACOM/UFMS, envie propostas de pesquisa ou acompanhe nossas produções nas redes.
+            Encontre o laboratório no campus da UFMS ou acompanhe o desenvolvimento dos nossos projetos nas redes sociais.
           </p>
         </motion.div>
 
-        {/* 4 Connection Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {mediaCards.map((item, index) => {
             const Icon = item.icon;
@@ -85,10 +95,6 @@ const MediaSection = () => {
                 className="group relative bg-[#08080A] border border-white/20 hover:border-white p-6 transition-all duration-300 flex flex-col justify-between shadow-2xl"
               >
                 {/* Top Corner Mark */}
-                <div className="flex items-center justify-between font-mono text-[9px] text-[#9999A5] mb-5">
-                  <span className="text-[#0051ff] font-bold">[{item.id}]</span>
-                  <span>{item.label}</span>
-                </div>
 
                 {/* Icon & Title */}
                 <div className="space-y-4 mb-6">

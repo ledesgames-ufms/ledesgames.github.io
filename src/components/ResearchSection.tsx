@@ -51,10 +51,6 @@ const ResearchSection = () => {
           transition={{ duration: 0.6 }}
           className="mb-14"
         >
-          <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-[#71717A] mb-2">
-            <span className="w-1.5 h-1.5 bg-[#0051ff]" />
-            <span>PRODUÇÃO CIENTÍFICA // FACOM UFMS</span>
-          </div>
 
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div>
@@ -164,10 +160,7 @@ const ResearchCard = ({ publication }: { publication: Publication }) => {
       transition={{ duration: 0.3 }}
       className="group relative bg-white border border-zinc-300 hover:border-[#0051ff] transition-all duration-300 p-6 sm:p-8 shadow-sm"
     >
-      {/* Corner Marks */}
-      <span className="absolute top-2 left-2 font-mono text-[9px] text-[#0051ff] select-none font-bold">+ DOC_{publication.id}</span>
-      <span className="absolute top-2 right-2 font-mono text-[9px] text-[#A1A1AA] select-none">ARCHIVE.FACOM</span>
-
+      
       {/* Meta Top Line */}
       <div className="flex flex-wrap items-center gap-3 mb-4 mt-2">
         <span className="px-2.5 py-0.5 bg-[#0051ff] text-white font-mono text-[10px] font-bold uppercase tracking-wider">

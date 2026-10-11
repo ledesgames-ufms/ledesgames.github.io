@@ -103,14 +103,6 @@ const InstitutionalSection = () => {
         {/* Top Header Information Overlay */}
         <div className="container mx-auto px-4 lg:px-8 relative z-10 h-full flex flex-col justify-between py-10">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-white/80">
-              <span className="w-1.5 h-1.5 bg-[#0051ff]" />
-              <span>INSTITUCIONAL // FACOM UFMS</span>
-            </div>
-
-            <span className="px-3 py-1 bg-black/70 border border-white/20 font-mono text-[10px] text-white/90 uppercase">
-              FOTO 0{currentPhotoIndex + 1} DE 0{teamPhotos.length}
-            </span>
           </div>
 
           {/* Bottom Caption Overlay */}
@@ -165,9 +157,6 @@ const InstitutionalSection = () => {
         {/* Narrative Block */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 xl:gap-14 mb-20 items-start">
           <div className="lg:col-span-5 space-y-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-white/[0.03] border border-white/10 font-mono text-[10px] text-[#9999A5] uppercase tracking-wider">
-              <span>MANIFESTO DO ESTÚDIO</span>
-            </div>
 
             <h2 className="font-display text-4xl sm:text-6xl text-white uppercase tracking-wider leading-none">
               Onde Pesquisa Científica Gera <span className="text-[#0051ff]">Jogos Reais</span>
@@ -205,9 +194,6 @@ const InstitutionalSection = () => {
                     <div className="w-12 h-12 bg-white/[0.03] border border-white/10 group-hover:border-[#0051ff] group-hover:bg-[#0051ff]/10 flex items-center justify-center transition-colors">
                       <Icon className="w-6 h-6 text-[#0051ff]" />
                     </div>
-                    <span className="font-mono text-xs font-bold text-white/30 group-hover:text-[#0051ff] transition-colors">
-                      PILAR_{pillar.id}
-                    </span>
                   </div>
 
                   <h4 className="font-display text-2xl uppercase tracking-wider text-white mb-3 group-hover:text-[#0051ff] transition-colors">
@@ -217,10 +203,6 @@ const InstitutionalSection = () => {
                   <p className="font-sans text-sm text-[#9999A5] leading-relaxed">
                     {pillar.description}
                   </p>
-                </div>
-
-                <div className="pt-4 mt-6 border-t border-white/5 font-mono text-[9px] uppercase tracking-wider text-white/40">
-                  LEDES // FACOM.UFMS
                 </div>
               </motion.div>
             );

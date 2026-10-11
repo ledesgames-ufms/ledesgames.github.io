@@ -15,15 +15,6 @@ const Footer = () => {
         
         {/* Top Partner Logos Strip */}
         <div className="mb-14 pb-12 border-b border-white/10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
-          <div>
-            <div className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-[0.25em] text-[#9999A5] mb-2">
-              <span className="w-1.5 h-1.5 bg-[#0051ff]" />
-              <span>ECOSSISTEMA ACADÊMICO & INSTITUCIONAL</span>
-            </div>
-            <h3 className="font-display font-bold text-2xl uppercase tracking-tight text-white">
-              Laboratório Vinculado à UFMS
-            </h3>
-          </div>
 
           {/* Partner Brand Logos */}
           <div className="flex items-center gap-6 sm:gap-8 flex-wrap">
@@ -119,7 +110,7 @@ const Footer = () => {
           {/* Navigation Column */}
           <div>
             <h4 className="font-mono text-xs font-bold text-white uppercase tracking-widest mb-4 flex items-center gap-1.5">
-              <span className="text-[#0051ff]">[01]</span> NAVEGAÇÃO
+              <span className="text-[#0051ff]"></span> NAVEGAÇÃO
             </h4>
             <ul className="space-y-2.5 font-cyber text-xs">
               <li>
@@ -148,7 +139,7 @@ const Footer = () => {
           {/* Research & Game Resources */}
           <div>
             <h4 className="font-mono text-xs font-bold text-white uppercase tracking-widest mb-4 flex items-center gap-1.5">
-              <span className="text-[#0051ff]">[02]</span> RECURSOS
+              <span className="text-[#0051ff]"></span> RECURSOS
             </h4>
             <ul className="space-y-2.5 font-cyber text-xs">
               <li>
@@ -178,7 +169,7 @@ const Footer = () => {
           {/* Institutional Links */}
           <div>
             <h4 className="font-mono text-xs font-bold text-white uppercase tracking-widest mb-4 flex items-center gap-1.5">
-              <span className="text-[#0051ff]">[03]</span> INSTITUCIONAL
+              <span className="text-[#0051ff]"></span> INSTITUCIONAL
             </h4>
             <ul className="space-y-2.5 font-cyber text-xs">
               <li>
@@ -206,13 +197,9 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px] text-[#9999A5]">
           <div>
-            © {new Date().getFullYear()} LEDES GAMES // FACOM - UNIVERSIDADE FEDERAL DE MATO GROSSO DO SUL.
+            © {new Date().getFullYear()} LEDES GAMES FACOM - UNIVERSIDADE FEDERAL DE MATO GROSSO DO SUL.
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#0051ff]" />
-            <span>SISTEMA ATIVO // CAMPO GRANDE, MS</span>
-          </div>
         </div>
 
       </div>
