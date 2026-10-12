@@ -29,7 +29,7 @@ export interface Game {
 export const games: Game[] = [
   {
     id: 1,
-    title: 'Museu das Mulheres Negras',
+    title: 'Museu das Mulheres (Des)Conhecidas',
     released: true,
     description: 'Experiência cultural e educativa interativa.',
     longDescription: 'Uma experiência imersiva que celebra as contribuições de mulheres negras na história.',

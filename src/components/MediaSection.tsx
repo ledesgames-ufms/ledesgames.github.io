@@ -9,9 +9,9 @@ const mediaCards = [
     label: 'LOCALIZAÇÃO',
     icon: MapPin,
     title: 'Visite Nosso Lab',
-    desc: 'FACOM // UFMS\nCidade Universitária\nCampo Grande - MS',
-    actionText: 'Ver no Campus',
-    link: 'https://facom.ufms.br',
+    desc: 'FACOM - UFMS\nCidade Universitária\nCampo Grande - MS',
+    actionText: 'Ver no Maps',
+    link: 'https://maps.app.goo.gl/8boLtonvQZzuK2La9',
     isExternal: true,
   },
   {
@@ -19,16 +19,16 @@ const mediaCards = [
     label: 'COMUNICAÇÃO',
     icon: Mail,
     title: 'Contato Direto',
-    desc: 'Fale com nossos pesquisadores e coordenadores de projetos.',
+    desc: 'Fale com nossos pesquisadores.',
     actionText: 'ledesgames.facom@ufms.br',
     link: 'mailto:ledesgames.facom@ufms.br',
     isExternal: false,
   },
   {
     id: '03',
-    label: 'SOCIAL // UPDATES',
+    label: 'SOCIAL',
     icon: Instagram,
-    title: 'Instagram do Lab',
+    title: 'Instagram',
     desc: 'Acompanhe novidades, bastidores e lançamentos em tempo real.',
     actionText: '@ledesfacom',
     link: 'https://www.instagram.com/ledesfacom/',
@@ -36,9 +36,9 @@ const mediaCards = [
   },
   {
     id: '04',
-    label: 'VÍDEO // TRAILERS',
+    label: 'VÍDEO',
     icon: Youtube,
-    title: 'Canal Oficial',
+    title: 'YouTube',
     desc: 'Assista aos trailers oficiais, gameplays e palestras do estúdio.',
     actionText: 'youtube.com/@ledesgames',
     link: 'https://www.youtube.com/@ledesgames',
@@ -75,11 +75,8 @@ const MediaSection = () => {
           className="flex flex-col items-center text-center mb-12 md:mb-16"
         >
           <h2 className="font-display text-4xl sm:text-6xl uppercase tracking-wider text-white leading-none">
-            Conecte-se com o Estúdio
+            Conecte-se conosco
           </h2>
-          <p className="text-white/90 font-sans text-base mt-3 leading-relaxed">
-            Encontre o laboratório no campus da UFMS ou acompanhe o desenvolvimento dos nossos projetos nas redes sociais.
-          </p>
         </motion.div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">

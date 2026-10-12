@@ -20,21 +20,21 @@ const teamPhotos: TeamPhoto[] = [
     src: team1,
     title: 'Mini Curso de Desenvolvimento de Jogos 2D',
     date: 'Agosto de 2025',
-    description: 'Aplicação prática do mini curso de desenvolvimento de jogos 2D ministrado por membros do laboratório para a comunidade acadêmica da UFMS.',
+    description: 'Apresentação do mini curso de desenvolvimento de jogos 2D ministrado por membros do laboratório para a comunidade acadêmica da UFMS.',
   },
   {
     id: 'photo-2',
     src: team2,
-    title: 'Apresentação no Simpósio SBGames',
+    title: 'Premiação no Simpósio SBGames',
     date: 'Maio de 2025',
-    description: 'Participação da equipe no simpósio SBGames apresentando os artigos científicos e pesquisas desenvolvidas no laboratório.',
+    description: 'Participação e premiação da equipe no simpósio SBGames.',
   },
   {
     id: 'photo-3',
     src: team3,
-    title: 'Equipe de Extensão e Desenvolvimento',
+    title: 'Mini Curso de Desenvolvimento de Jogos 2D',
     date: 'Agosto de 2025',
-    description: 'Integrantes do projeto LEDES Games reunidos no campus da FACOM/UFMS durante oficina de prototipagem e desenvolvimento.',
+    description: '',
   }
 ];
 
@@ -43,19 +43,19 @@ const pillars = [
     id: '01',
     icon: Lightbulb,
     title: 'Pesquisa & Desenvolvimento',
-    description: 'Metodologias inovadoras em engenharia de software e game design aplicadas à criação de experiências digitais com fundamentação científica.',
+    description: 'Metodologias inovadoras em engenharia de software e game design aplicadas à criação de experiências digitais.',
   },
   {
     id: '02',
     icon: Users,
     title: 'Equipe Multidisciplinar',
-    description: 'Integração de alunos e pesquisadores de programação, arte 2D/3D, modelagem, roteiro, sound design e acessibilidade.',
+    description: 'Times autogerenciados integrados por estudantes das áreas de computação, design 2D/3D, narrativa e sound design.',
   },
   {
     id: '03',
     icon: Cpu,
     title: 'Engenharia & Ferramentas',
-    description: 'Utilização de engines modernas (Unity, Godot, Unreal), pipelines ágeis e boas práticas para entregar jogos funcionais e memoráveis.',
+    description: 'Domínio de game engines, pipelines ágeis e boas práticas para entregar jogos de alta qualidade.',
   },
 ];
 
@@ -159,7 +159,7 @@ const InstitutionalSection = () => {
           <div className="lg:col-span-5 space-y-4">
 
             <h2 className="font-display text-4xl sm:text-6xl text-white uppercase tracking-wider leading-none">
-              Onde Pesquisa Científica Gera <span className="text-[#0051ff]">Jogos Reais</span>
+              Onde <span className="text-[#0051ff]">Pesquisa</span> e <span className="text-[#0051ff]">Jogos</span> convergem
             </h2>
           </div>
 
@@ -168,10 +168,10 @@ const InstitutionalSection = () => {
               O <strong className="text-white">LEDES Games</strong> é o laboratório e estúdio de desenvolvimento de jogos digitais sediado na Faculdade de Computação (FACOM) da Universidade Federal de Mato Grosso do Sul (UFMS).
             </p>
             <p>
-              Trabalhamos na convergência entre o entretenimento eletrônico de alta qualidade e o rigor da pesquisa científica, desenvolvendo desde jogos educacionais até entretenimento e experiências experimentais.
+              Atuamos na intersecção entre o entretenimento eletrônico e a pesquisa acadêmica na área de jogos digitais, desenvolvendo experiências e artefatos que viram conhecimento científico e produtos comerciais.
             </p>
             <p>
-              Nossa missão é qualificar novos talentos nas áreas de engenharia de software, arte e design, gerando propriedade intelectual e impacto positivo na sociedade.
+              Visamos qualificar novos talentos nas áreas de engenharia de software, arte e design, engenharia de áudio e demais áreas relacionadas, gerando propriedade intelectual e impactos relevantes na sociedade e comunidade acadêmica.
             </p>
           </div>
         </div>

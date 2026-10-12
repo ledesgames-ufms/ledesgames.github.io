@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, ArrowUpRight, Terminal } from 'lucide-react';
+import { Menu, X, ArrowUpRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import logoLedes from '@/assets/logo-ledes-games.png';
 
@@ -27,7 +27,7 @@ const Header = () => {
     { id: 'hero', index: '01', label: 'Início' },
     { id: 'games', index: '02', label: 'Jogos' },
     { id: 'research', index: '03', label: 'Pesquisa' },
-    { id: 'about', index: '04', label: 'Sobre o Lab' },
+    { id: 'about', index: '04', label: 'Laboratório' },
     { id: 'media', index: '05', label: 'Conexões' },
   ];
 
@@ -40,26 +40,22 @@ const Header = () => {
       }`}
     >
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+        <div className="relative flex items-center justify-between h-14">
           
           {/* Studio Brand */}
           <div 
             onClick={() => scrollToSection('hero')}
-            className="flex items-center gap-3 cursor-pointer select-none"
+            className="flex items-center h-full cursor-pointer select-none z-10 transition-opacity hover:opacity-85 m-0 p-0"
           >
-            <div className="relative flex items-center justify-center w-10 h-10 bg-white/[0.03] border border-white/10">
-              <img 
-                src={logoLedes} 
-                alt="LEDES Games Logo" 
-                className="w-7 h-7 object-contain"
-              />
-              <span className="absolute -bottom-1 -right-1 w-1.5 h-1.5 bg-[#0051ff]" />
-            </div>
-
+            <img 
+              src={logoLedes} 
+              alt="LEDES Games Logo" 
+              className="h-[75%] w-auto object-contain block m-0 p-0"
+            />
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-1 xl:gap-2">
+          <nav className="hidden lg:flex items-center gap-1 xl:gap-2 absolute left-1/2 -translate-x-1/2">
             {navItems.map((item) => (
               <button
                 key={item.id}
@@ -71,18 +67,6 @@ const Header = () => {
               </button>
             ))}
           </nav>
-
-          {/* Right Action / Status Bar */}
-          <div className="hidden sm:flex items-center gap-4">
-
-            <button
-              onClick={() => scrollToSection('games')}
-              className="group relative inline-flex items-center gap-2 px-5 py-2.5 bg-white text-black font-cyber font-bold text-xs uppercase tracking-wider hover:bg-[#0051ff] hover:text-white transition-all duration-300 tech-cut-sm"
-            >
-              <span>Explorar Catálogo</span>
-              <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </button>
-          </div>
 
           {/* Mobile Menu Toggle Button */}
           <div className="flex lg:hidden items-center gap-2">
@@ -109,25 +93,11 @@ const Header = () => {
                   className="flex items-center justify-between px-4 py-3 border-b border-white/5 font-cyber text-sm uppercase tracking-wider text-[#9999A5] hover:text-white hover:bg-white/[0.02] text-left transition-colors"
                 >
                   <span className="flex items-center gap-3">
-                    <span className="font-mono text-xs text-[#0051ff]">{item.index}</span>
                     <span className="text-white font-medium">{item.label}</span>
                   </span>
                   <ArrowUpRight className="w-4 h-4 text-white/40" />
                 </button>
               ))}
-
-              <div className="pt-4 px-4 flex flex-col gap-3">
-                <div className="flex items-center gap-2 font-mono text-[10px] text-[#9999A5]">
-                  <span className="w-2 h-2 rounded-full bg-[#0051ff]" />
-                  <span>LAB ONLINE // FACOM UFMS</span>
-                </div>
-                <button
-                  onClick={() => scrollToSection('games')}
-                  className="w-full py-3 bg-[#0051ff] text-white font-cyber font-bold text-xs uppercase tracking-wider text-center"
-                >
-                  Ver Jogos do Estúdio
-                </button>
-              </div>
             </div>
           </div>
         )}

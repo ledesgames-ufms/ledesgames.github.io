@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useRef } from "react";
+import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
 import {
   Play,
   ArrowUpRight,
@@ -14,34 +14,6 @@ import { games, Game } from "@/data/Games";
 import GameModal from "@/components/GameModal";
 
 type ViewMode = "showcase" | "console" | "matrix";
-
-const bannerSlideVariants = {
-  enter: (dir: number) => ({
-    x: dir > 0 ? 180 : dir < 0 ? -180 : 0,
-    opacity: 0,
-    scale: 0.96,
-  }),
-  center: {
-    x: 0,
-    opacity: 1,
-    scale: 1,
-    transition: {
-      x: { type: "spring", stiffness: 280, damping: 30 },
-      opacity: { duration: 0.3 },
-      scale: { duration: 0.3 }
-    }
-  },
-  exit: (dir: number) => ({
-    x: dir > 0 ? -180 : dir < 0 ? 180 : 0,
-    opacity: 0,
-    scale: 0.96,
-    transition: {
-      x: { type: "spring", stiffness: 280, damping: 30 },
-      opacity: { duration: 0.25 },
-      scale: { duration: 0.25 }
-    }
-  })
-};
 
 const textSlideVariants = {
   enter: (dir: number) => ({
@@ -64,28 +36,120 @@ const GameGrid = () => {
   const [viewMode, setViewMode] = useState<ViewMode>("showcase");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [modalGame, setModalGame] = useState<Game | null>(null);
 
+  const controls = useAnimationControls();
+  const trackRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+
   const activeGame = games[currentIndex] || games[0];
-  const prevIndex = (currentIndex - 1 + games.length) % games.length;
-  const nextIndex = (currentIndex + 1) % games.length;
-  const prevGame = games[prevIndex];
-  const nextGame = games[nextIndex];
 
-  const handlePrev = () => {
-    setDirection(-1);
-    setCurrentIndex(prevIndex);
+  const getStep = () => {
+    if (trackRef.current && trackRef.current.children.length >= 4) {
+      const slot0 = trackRef.current.children[2] as HTMLElement;
+      const slot1 = trackRef.current.children[3] as HTMLElement;
+      if (slot0 && slot1) {
+        const dist = slot1.offsetLeft - slot0.offsetLeft;
+        if (dist > 0) return dist;
+      }
+    }
+    if (cardRef.current) {
+      return cardRef.current.offsetWidth + 16;
+    }
+    if (typeof window !== "undefined") {
+      return Math.min(window.innerWidth * 0.82, 1152) + 16;
+    }
+    return 1000;
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
     setDirection(1);
-    setCurrentIndex(nextIndex);
+    const step = getStep();
+
+    await controls.start({
+      x: -step,
+      transition: { type: "spring", stiffness: 280, damping: 30 },
+    });
+
+    setCurrentIndex((prev) => (prev + 1) % games.length);
+    controls.set({ x: 0 });
+    setIsTransitioning(false);
   };
 
-  const handleDotClick = (idx: number) => {
-    if (idx === currentIndex) return;
-    setDirection(idx > currentIndex ? 1 : -1);
+  const handlePrev = async () => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setDirection(-1);
+    const step = getStep();
+
+    await controls.start({
+      x: step,
+      transition: { type: "spring", stiffness: 280, damping: 30 },
+    });
+
+    setCurrentIndex((prev) => (prev - 1 + games.length) % games.length);
+    controls.set({ x: 0 });
+    setIsTransitioning(false);
+  };
+
+  const handleDotClick = async (idx: number) => {
+    if (idx === currentIndex || isTransitioning) return;
+    const diff = (idx - currentIndex + games.length) % games.length;
+    const isForward = diff <= games.length / 2;
+    const dir = isForward ? 1 : -1;
+
+    setIsTransitioning(true);
+    setDirection(dir);
+    const step = getStep();
+
+    await controls.start({
+      x: dir > 0 ? -step : step,
+      transition: { type: "spring", stiffness: 280, damping: 30 },
+    });
+
     setCurrentIndex(idx);
+    controls.set({ x: 0 });
+    setIsTransitioning(false);
+  };
+
+  const getGameAt = (offset: number) => {
+    const idx = (currentIndex + offset + games.length * 10) % games.length;
+    return games[idx];
+  };
+
+  const slots = [-2, -1, 0, 1, 2];
+
+  const springTransition = { type: "spring", stiffness: 280, damping: 30 };
+
+  const getCardAnimation = (offset: number) => {
+    if (!isTransitioning) {
+      return {
+        height: offset === 0 ? "100%" : "88%",
+        opacity: offset === 0 ? 1 : 0.4,
+        transition: springTransition,
+      };
+    }
+
+    if (direction === 1) {
+      if (offset === 1) return { height: "100%", opacity: 1, transition: springTransition };
+      if (offset === 0) return { height: "88%", opacity: 0.4, transition: springTransition };
+      return { height: "88%", opacity: 0.4, transition: springTransition };
+    }
+
+    if (direction === -1) {
+      if (offset === -1) return { height: "100%", opacity: 1, transition: springTransition };
+      if (offset === 0) return { height: "88%", opacity: 0.4, transition: springTransition };
+      return { height: "88%", opacity: 0.4, transition: springTransition };
+    }
+
+    return {
+      height: offset === 0 ? "100%" : "88%",
+      opacity: offset === 0 ? 1 : 0.4,
+      transition: springTransition,
+    };
   };
 
   return (
@@ -97,10 +161,10 @@ const GameGrid = () => {
         <div className="container mx-auto px-4 lg:px-8">
           
           {/* Section Header */}
-          <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <header className={`flex flex-col md:flex-row md:items-end justify-between gap-6 ${viewMode === "showcase" ? "mb-4 sm:mb-6" : "mb-10 sm:mb-12"}`}>
             <div>
               <h2 className="font-display text-4xl sm:text-6xl tracking-wider text-white uppercase leading-none">
-                Jogos <span className="text-[#0051ff]">Desenvolvidos</span>
+                Nossos <span className="text-[#0051ff]">Jogos</span>
               </h2>
             </div>
 
@@ -152,89 +216,84 @@ const GameGrid = () => {
         </div>
 
         {/* ========================================================================= */}
-          {/* MODO 1: SHOWCASE                                                          */}
+        {/* MODO 1: SHOWCASE                                                          */}
         {/* ========================================================================= */}
         {viewMode === "showcase" && (
           <div className="relative w-full overflow-hidden">
             
-            {/* Grand Bleed Carousel Container */}
-            <div className="relative flex items-center justify-center w-full min-h-[360px] sm:min-h-[460px] md:min-h-[540px] lg:min-h-[600px]">
+            {/* Carousel Container */}
+            <div className="relative flex items-center justify-center w-full overflow-hidden">
               
-              {/* Central Track */}
-              <div className="flex items-center justify-center gap-3.5 sm:gap-4 lg:gap-5 w-[220vw] shrink-0 pointer-events-none">
-                
-                {/* PREVIOUS PEEK (Quase todo fora da tela, apenas ponta visível) */}
-                <div 
-                  onClick={handlePrev}
-                  className="w-[78vw] sm:w-[80vw] md:w-[82vw] max-w-6xl aspect-[16/10] sm:aspect-[21/10] md:aspect-[21/9] rounded-md overflow-hidden bg-black border border-white/15 opacity-40 hover:opacity-75 transition-opacity cursor-pointer pointer-events-auto shrink-0 shadow-2xl relative"
-                  title={`Anterior: ${prevGame.title}`}
-                >
-                  <img 
-                    src={prevGame.image} 
-                    alt={prevGame.title} 
-                    className="w-full h-full object-cover filter grayscale contrast-110"
-                  />
-                  <div className="absolute inset-0 bg-[#08080A]/60" />
-                </div>
+              {/* Central Moving Track */}
+              <motion.div
+                ref={trackRef}
+                animate={controls}
+                className="flex items-center justify-center gap-3 sm:gap-3.5 md:gap-4 shrink-0"
+              >
+                {slots.map((offset) => {
+                  const game = getGameAt(offset);
+                  const isCenter = offset === 0;
 
-                {/* ACTIVE GAME */}
-                <div className="w-[78vw] sm:w-[80vw] md:w-[82vw] max-w-6xl aspect-[16/10] sm:aspect-[21/10] md:aspect-[21/9] pointer-events-auto shrink-0 z-10">
-                  <AnimatePresence mode="wait" custom={direction}>
-                    <motion.div
-                      key={activeGame.id}
-                      custom={direction}
-                      variants={bannerSlideVariants}
-                      initial="enter"
-                      animate="center"
-                      exit="exit"
-                      onClick={() => setModalGame(activeGame)}
-                      className="relative w-full h-full bg-black border border-white/20 rounded-md shadow-2xl overflow-hidden cursor-pointer group"
+                  return (
+                    <div
+                      key={offset}
+                      ref={isCenter ? cardRef : undefined}
+                      className="w-[78vw] sm:w-[80vw] md:w-[82vw] max-w-6xl aspect-[16/10] sm:aspect-[21/10] md:aspect-[21/9] shrink-0 pointer-events-auto select-none relative flex items-center justify-center"
                     >
-                      {/* Corner Marks */}
-                      <span className="absolute top-3 right-4 font-mono text-[9px] text-white/50 select-none z-20 bg-black/60 px-2 py-0.5 border border-white/10 rounded-sm">
-                        {activeGame.released ? 'LANÇADO' : 'EM DESENVOLVIMENTO'}
-                      </span>
+                      <motion.div
+                        animate={getCardAnimation(offset)}
+                        whileHover={!isCenter && !isTransitioning ? { opacity: 0.75 } : undefined}
+                        onClick={() => {
+                          if (isTransitioning) return;
+                          if (offset === 0) setModalGame(game);
+                          else if (offset === 1) handleNext();
+                          else if (offset === -1) handlePrev();
+                        }}
+                        className={`relative w-full bg-black border border-white/20 rounded-md shadow-2xl overflow-hidden cursor-pointer group origin-center transition-shadow ${
+                          isCenter ? "hover:border-[#0051ff]/80" : "hover:border-white/40"
+                        }`}
+                        title={game.title}
+                      >
+                        {/* Corner Marks */}
+                        {isCenter && (
+                          <span className="absolute top-3 right-4 font-mono text-[9px] text-white/50 select-none z-20 bg-black/60 px-2 py-0.5 border border-white/10 rounded-sm">
+                            {game.released ? 'LANÇADO' : 'EM DESENVOLVIMENTO'}
+                          </span>
+                        )}
 
-                      <img
-                        src={activeGame.image}
-                        alt={activeGame.title}
-                        className="w-full h-full object-cover filter contrast-105 group-hover:scale-105 transition-transform duration-700"
-                      />
+                        <img
+                          src={game.image}
+                          alt={game.title}
+                          className={`w-full h-full object-cover filter ${
+                            isCenter ? 'contrast-105 group-hover:scale-105' : 'grayscale contrast-110'
+                          } transition-transform duration-700`}
+                        />
 
-                      {/* Vignette Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-[#08080A] via-transparent to-transparent opacity-80" />
+                        {/* Vignette Overlay */}
+                        <div className={`absolute inset-0 bg-gradient-to-t ${
+                          isCenter ? 'from-[#08080A] via-transparent to-transparent opacity-80' : 'bg-[#08080A]/60'
+                        }`} />
 
-                      {/* Click Trigger Overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
-                        <div className="px-5 py-2.5 bg-white text-black font-cyber font-bold text-xs uppercase tracking-wider hover:bg-[#0051ff] hover:text-white transition-colors flex items-center gap-2 rounded-sm shadow-xl">
-                          <Gamepad2 className="w-4 h-4" />
-                          <span>Abrir Detalhes do Jogo</span>
-                        </div>
-                      </div>
-                    </motion.div>
-                  </AnimatePresence>
-                </div>
-
-                {/* NEXT PEEK (Direita) */}
-                <div 
-                  onClick={handleNext}
-                  className="w-[78vw] sm:w-[80vw] md:w-[82vw] max-w-6xl aspect-[16/10] sm:aspect-[21/10] md:aspect-[21/9] rounded-md overflow-hidden bg-black border border-white/15 opacity-40 hover:opacity-75 transition-opacity cursor-pointer pointer-events-auto shrink-0 shadow-2xl relative"
-                  title={`Próximo: ${nextGame.title}`}
-                >
-                  <img 
-                    src={nextGame.image} 
-                    alt={nextGame.title} 
-                    className="w-full h-full object-cover filter grayscale contrast-110"
-                  />
-                  <div className="absolute inset-0 bg-[#08080A]/60" />
-                </div>
-
-              </div>
+                        {/* Click Trigger Overlay */}
+                        {isCenter && (
+                          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
+                            <div className="px-5 py-2.5 bg-white text-black font-cyber font-bold text-xs uppercase tracking-wider hover:bg-[#0051ff] hover:text-white transition-colors flex items-center gap-2 rounded-sm shadow-xl">
+                              <Gamepad2 className="w-4 h-4" />
+                              <span>Abrir</span>
+                            </div>
+                          </div>
+                        )}
+                      </motion.div>
+                    </div>
+                  );
+                })}
+              </motion.div>
 
               {/* Botões de Navegação */}
               <button
                 onClick={handlePrev}
-                className="absolute left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:p-3 bg-black/70 border border-white/20 hover:border-[#0051ff] text-white transition-colors flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto active:scale-95"
+                disabled={isTransitioning}
+                className="absolute left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:p-3 bg-black/70 border border-white/20 hover:border-[#0051ff] text-white transition-colors flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto active:scale-95 disabled:opacity-40"
                 aria-label="Jogo anterior"
               >
                 <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -242,7 +301,8 @@ const GameGrid = () => {
 
               <button
                 onClick={handleNext}
-                className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:p-3 bg-black/70 border border-white/20 hover:border-[#0051ff] text-white transition-colors flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto active:scale-95"
+                disabled={isTransitioning}
+                className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:p-3 bg-black/70 border border-white/20 hover:border-[#0051ff] text-white transition-colors flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto active:scale-95 disabled:opacity-40"
                 aria-label="Próximo jogo"
               >
                 <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -251,7 +311,7 @@ const GameGrid = () => {
             </div>
 
             {/* Informações do Banner */}
-            <div className="container mx-auto px-4 mt-4 sm:mt-5 text-center max-w-3xl min-h-[90px] flex flex-col justify-center">
+            <div className="container mx-auto px-4 mt-3 sm:mt-4 text-center max-w-3xl">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
                   key={activeGame.id}
@@ -275,18 +335,19 @@ const GameGrid = () => {
                   </div>
 
                   {/* Nome */}
-                  <h3 className="font-display text-4xl sm:text-6xl text-white tracking-wider uppercase leading-none">
+                  <h3 className="font-display text-2xl sm:text-3xl text-white tracking-wider uppercase leading-none">
                     {activeGame.title}
                   </h3>
                 </motion.div>
               </AnimatePresence>
 
-              {/* Slider Navigation Dots */}
+              {/* Navigation Dots */}
               <div className="flex items-center justify-center gap-1.5 pt-3">
                 {games.map((_, idx) => (
                   <button
                     key={idx}
                     onClick={() => handleDotClick(idx)}
+                    disabled={isTransitioning}
                     className={`h-1.5 transition-all duration-300 rounded-full ${
                       idx === currentIndex ? 'w-6 bg-[#0051ff]' : 'w-2 bg-white/20 hover:bg-white/40'
                     }`}
@@ -301,7 +362,7 @@ const GameGrid = () => {
         )}
 
         {/* ========================================================================= */}
-        {/* MODO 2: CONSOLE / LISTA TÉCNICA                                           */}
+        {/* MODO 2: CONSOLE                                                           */}
         {/* ========================================================================= */}
         {viewMode === "console" && (
           <div className="container mx-auto px-4 lg:px-8">
@@ -310,7 +371,7 @@ const GameGrid = () => {
               {/* Left Column: Project Index */}
               <div className="lg:col-span-5 bg-[#08080A] border border-white/15 divide-y divide-white/5 rounded-lg overflow-hidden">
                 <div className="p-4 bg-white/[0.02] border-b border-white/10 flex items-center justify-between font-mono text-[10px] text-[#9999A5] uppercase tracking-wider">
-                  <span>[ ÍNDICE DE PROJETOS ]</span>
+                  <span>PROJETOS</span>
                   <span>TOTAL: {games.length}</span>
                 </div>
 
@@ -336,7 +397,7 @@ const GameGrid = () => {
                               {game.title}
                             </h4>
                             <div className="flex items-center gap-2 font-mono text-[10px] text-[#9999A5] truncate">
-                              <span>{game.tags.slice(0, 2).join(" // ")}</span>
+                              <span>{game.tags.slice(0, 2).join(", ")}</span>
                             </div>
                           </div>
                         </div>
@@ -359,8 +420,7 @@ const GameGrid = () => {
               {/* Right Column: Inspection Panel */}
               <div className="lg:col-span-7 bg-[#08080A] border border-white/15 p-6 sm:p-8 space-y-6 rounded-lg">
                 <div className="flex items-center justify-between border-b border-white/10 pb-4 font-mono text-[10px] text-[#9999A5]">
-                  <span>INSPEÇÃO TÉCNICA: LG-0{activeGame.id}</span>
-                  <span className="text-[#0051ff]">STATUS: {activeGame.released ? 'ESTÁVEL // DISPONÍVEL' : 'EM DESENVOLVIMENTO'}</span>
+                  <span className="text-[#0051ff]">STATUS: {activeGame.released ? 'DISPONÍVEL' : 'EM DESENVOLVIMENTO'}</span>
                 </div>
 
                 <div className="relative aspect-video bg-black overflow-hidden border border-white/10 rounded-lg">
@@ -382,7 +442,7 @@ const GameGrid = () => {
 
                 <div className="grid grid-cols-2 gap-4 border-y border-white/10 py-4 font-mono text-xs">
                   <div>
-                    <span className="text-[#9999A5] block text-[10px] uppercase">Gênero / Tags</span>
+                    <span className="text-[#9999A5] block text-[10px] uppercase">Tags</span>
                     <span className="text-white font-medium">{activeGame.tags.join(", ")}</span>
                   </div>
                   <div>
@@ -406,7 +466,7 @@ const GameGrid = () => {
                     onClick={() => setModalGame(activeGame)}
                     className="px-5 py-3 bg-white/[0.04] border border-white/20 text-white hover:border-[#0051ff] font-cyber font-bold text-xs uppercase tracking-wider transition-colors inline-flex items-center gap-1.5 rounded-sm"
                   >
-                    <span>Abrir Ficha Técnica</span>
+                    <span>Detalhes</span>
                     <ArrowUpRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -438,7 +498,7 @@ const GameGrid = () => {
 
                     <div className="absolute top-2 left-2 right-2 flex items-center justify-between font-mono text-[8px]">
                       <span className="px-1.5 py-0.5 bg-black/70 border border-white/10 text-white/80 rounded-sm">
-                        {game.released ? "LANÇADO" : "DEV"}
+                        {game.released ? "LANÇADO" : "EM DESENVOLVIMENTO"}
                       </span>
                     </div>
                   </div>
