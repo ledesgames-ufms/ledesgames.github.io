@@ -100,19 +100,26 @@ const ResearchSection = () => {
         {/* Publications List */}
         <div id="research-list" className="space-y-6 min-h-[350px]">
           <AnimatePresence mode="wait">
-            {currentItems.length > 0 ? (
-              currentItems.map((pub) => (
-                <ResearchCard key={pub.id} publication={pub} />
-              ))
-            ) : (
-              <motion.div 
-                initial={{ opacity: 0 }} 
-                animate={{ opacity: 1 }}
-                className="text-center py-16 text-[#71717A] bg-white border border-zinc-300 p-8 font-mono text-sm shadow-sm"
-              >
-                [ NENHUM DOCUMENTO LOCALIZADO NESTA CATEGORIA ]
-              </motion.div>
-            )}
+            <motion.div
+              key={`${activeFilter}-${currentPage}`}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25 }}
+              className="space-y-6"
+            >
+              {currentItems.length > 0 ? (
+                currentItems.map((pub) => (
+                  <ResearchCard key={pub.id} publication={pub} />
+                ))
+              ) : (
+                <div 
+                  className="text-center py-16 text-[#71717A] bg-white border border-zinc-300 p-8 font-mono text-sm shadow-sm"
+                >
+                  [ NENHUM DOCUMENTO LOCALIZADO NESTA CATEGORIA ]
+                </div>
+              )}
+            </motion.div>
           </AnimatePresence>
         </div>
 

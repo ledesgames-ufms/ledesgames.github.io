@@ -197,7 +197,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[11px] text-[#9999A5]">
           <div>
-            © {new Date().getFullYear()} LEDES GAMES FACOM - UNIVERSIDADE FEDERAL DE MATO GROSSO DO SUL.
+            © {new Date().getFullYear()} LEDES GAMES - FACOM - UNIVERSIDADE FEDERAL DE MATO GROSSO DO SUL.
           </div>
 
         </div>

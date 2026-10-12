@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ArrowUpRight } from 'lucide-react';
+import { AnimatePresence, motion } from 'framer-motion';
 import logoLedes from '@/assets/logo-ledes-games.png';
 
 const Header = () => {
@@ -73,33 +74,52 @@ const Header = () => {
               type="button"
               className="flex items-center justify-center text-white border border-white/10 hover:bg-white/[0.05] hover:border-[#0051ff] rounded-none w-10 h-10 transition-colors"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              aria-label="Abrir menu"
+              aria-label={isMobileMenuOpen ? "Fechar menu" : "Abrir menu"}
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
-
-        {/* Mobile Navigation Drawer */}
-        {isMobileMenuOpen && (
-          <div className="lg:hidden py-6 border-t border-white/10 bg-[#08080A]/95 backdrop-blur-xl animate-in slide-in-from-top-4">
-            <div className="flex flex-col gap-2">
-              {navItems.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => scrollToSection(item.id)}
-                  className="flex items-center justify-between px-4 py-3 border-b border-white/5 font-cyber text-sm uppercase tracking-wider text-[#9999A5] hover:text-white hover:bg-white/[0.02] text-left transition-colors"
-                >
-                  <span className="flex items-center gap-3">
-                    <span className="text-white font-medium">{item.label}</span>
-                  </span>
-                  <ArrowUpRight className="w-4 h-4 text-white/40" />
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Mobile Navigation Drawer */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="fixed inset-0 top-14 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+            />
+
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="lg:hidden relative z-50 border-t border-white/10 bg-[#08080A]/98 backdrop-blur-xl px-4 py-6 shadow-2xl"
+            >
+              <div className="flex flex-col gap-1">
+                {navItems.map((item) => (
+                  <button
+                    key={item.id}
+                    onClick={() => scrollToSection(item.id)}
+                    className="flex items-center justify-between px-4 py-3.5 border-b border-white/5 font-cyber text-sm uppercase tracking-wider text-[#9999A5] hover:text-white hover:bg-white/[0.03] active:bg-[#0051ff]/10 text-left transition-colors"
+                  >
+                    <span className="flex items-center gap-3">
+                      <span className="text-white font-medium">{item.label}</span>
+                    </span>
+                    <ArrowUpRight className="w-4 h-4 text-white/40" />
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
     </header>
   );
 };

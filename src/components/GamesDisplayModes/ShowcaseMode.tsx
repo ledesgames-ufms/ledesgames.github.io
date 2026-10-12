@@ -1,5 +1,5 @@
-import { useState, useRef } from "react";
-import { motion, AnimatePresence, useAnimationControls } from "framer-motion";
+import { useState, useRef, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Gamepad2 } from "lucide-react";
 import { Game } from "@/data/Games";
 
@@ -27,6 +27,13 @@ const textSlideVariants = {
   }),
 };
 
+function getOffset(index: number, current: number, total: number) {
+  let diff = index - current;
+  while (diff > total / 2) diff -= total;
+  while (diff < -total / 2) diff += total;
+  return diff;
+}
+
 export const ShowcaseMode = ({
   games,
   currentIndex,
@@ -34,155 +41,159 @@ export const ShowcaseMode = ({
   onSelectGame,
 }: ShowcaseModeProps) => {
   const [direction, setDirection] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [cardWidth, setCardWidth] = useState<number>(() =>
+    typeof window !== "undefined" ? Math.min(window.innerWidth * 0.82, 1152) : 1000
+  );
 
-  const controls = useAnimationControls();
-  const trackRef = useRef<HTMLDivElement>(null);
-  const cardRef = useRef<HTMLDivElement>(null);
+  // Gestos de toque e swipe
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const mouseStartX = useRef<number | null>(null);
+  const isDragging = useRef<boolean>(false);
 
   const activeGame = games[currentIndex] || games[0];
 
-  const getStep = () => {
-    if (trackRef.current && trackRef.current.children.length >= 4) {
-      const slot0 = trackRef.current.children[2] as HTMLElement;
-      const slot1 = trackRef.current.children[3] as HTMLElement;
-      if (slot0 && slot1) {
-        const dist = slot1.offsetLeft - slot0.offsetLeft;
-        if (dist > 0) return dist;
+  useEffect(() => {
+    const updateSize = () => {
+      if (containerRef.current) {
+        setCardWidth(containerRef.current.offsetWidth);
       }
-    }
-    if (cardRef.current) {
-      return cardRef.current.offsetWidth + 16;
-    }
-    if (typeof window !== "undefined") {
-      return Math.min(window.innerWidth * 0.82, 1152) + 16;
-    }
-    return 1000;
-  };
+    };
+    updateSize();
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
+  }, []);
 
-  const handleNext = async () => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
+  const step = cardWidth * 0.94 + 20;
+
+  const handleNext = () => {
     setDirection(1);
-    const step = getStep();
-
-    await controls.start({
-      x: -step,
-      transition: { type: "spring", stiffness: 280, damping: 30 },
-    });
-
     setCurrentIndex((prev) => (prev + 1) % games.length);
-    controls.set({ x: 0 });
-    setIsTransitioning(false);
   };
 
-  const handlePrev = async () => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
+  const handlePrev = () => {
     setDirection(-1);
-    const step = getStep();
-
-    await controls.start({
-      x: step,
-      transition: { type: "spring", stiffness: 280, damping: 30 },
-    });
-
     setCurrentIndex((prev) => (prev - 1 + games.length) % games.length);
-    controls.set({ x: 0 });
-    setIsTransitioning(false);
   };
 
-  const handleDotClick = async (idx: number) => {
-    if (idx === currentIndex || isTransitioning) return;
+  const handleDotClick = (idx: number) => {
+    if (idx === currentIndex) return;
     const diff = (idx - currentIndex + games.length) % games.length;
     const isForward = diff <= games.length / 2;
-    const dir = isForward ? 1 : -1;
-
-    setIsTransitioning(true);
-    setDirection(dir);
-    const step = getStep();
-
-    await controls.start({
-      x: dir > 0 ? -step : step,
-      transition: { type: "spring", stiffness: 280, damping: 30 },
-    });
-
+    setDirection(isForward ? 1 : -1);
     setCurrentIndex(idx);
-    controls.set({ x: 0 });
-    setIsTransitioning(false);
   };
 
-  const getGameAt = (offset: number) => {
-    const idx = (currentIndex + offset + games.length * 10) % games.length;
-    return games[idx];
+  // Suporte ao touch no mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
   };
 
-  const slots = [-2, -1, 0, 1, 2];
-  const springTransition = { type: "spring", stiffness: 280, damping: 30 };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
 
-  const getCardAnimation = (offset: number) => {
-    if (!isTransitioning) {
-      return {
-        height: offset === 0 ? "100%" : "88%",
-        opacity: offset === 0 ? 1 : 0.4,
-        transition: springTransition,
-      };
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40) {
+      if (deltaX < 0) {
+        handleNext();
+      } else {
+        handlePrev();
+      }
     }
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
 
-    if (direction === 1) {
-      if (offset === 1) return { height: "100%", opacity: 1, transition: springTransition };
-      if (offset === 0) return { height: "88%", opacity: 0.4, transition: springTransition };
-      return { height: "88%", opacity: 0.4, transition: springTransition };
+  // Suporte ao drag no desktop
+  const handleMouseDown = (e: React.MouseEvent) => {
+    mouseStartX.current = e.clientX;
+    isDragging.current = false;
+  };
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (mouseStartX.current !== null) {
+      if (Math.abs(e.clientX - mouseStartX.current) > 10) {
+        isDragging.current = true;
+      }
     }
+  };
 
-    if (direction === -1) {
-      if (offset === -1) return { height: "100%", opacity: 1, transition: springTransition };
-      if (offset === 0) return { height: "88%", opacity: 0.4, transition: springTransition };
-      return { height: "88%", opacity: 0.4, transition: springTransition };
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (mouseStartX.current !== null) {
+      const deltaX = e.clientX - mouseStartX.current;
+      if (Math.abs(deltaX) > 50) {
+        if (deltaX < 0) handleNext();
+        else handlePrev();
+      }
     }
-
-    return {
-      height: offset === 0 ? "100%" : "88%",
-      opacity: offset === 0 ? 1 : 0.4,
-      transition: springTransition,
-    };
+    mouseStartX.current = null;
   };
 
   return (
-    <div className="relative w-full overflow-hidden">
+    <div className="relative w-full overflow-hidden select-none">
       {/* Carousel Container */}
-      <div className="relative flex items-center justify-center w-full overflow-hidden">
-        {/* Central Moving Track */}
-        <motion.div
-          ref={trackRef}
-          animate={controls}
-          className="flex items-center justify-center gap-3 sm:gap-3.5 md:gap-4 shrink-0"
+      <div
+        className="relative flex items-center justify-center w-full overflow-hidden py-4 touch-pan-y"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+      >
+        {/* Stage Container */}
+        <div
+          ref={containerRef}
+          className="relative w-[78vw] sm:w-[80vw] md:w-[82vw] max-w-6xl aspect-[16/10] sm:aspect-[21/10] md:aspect-[21/9] flex items-center justify-center pointer-events-none"
         >
-          {slots.map((offset) => {
-            const game = getGameAt(offset);
+          {games.map((game, i) => {
+            const offset = getOffset(i, currentIndex, games.length);
             const isCenter = offset === 0;
+            const isVisible = Math.abs(offset) <= 1.5;
 
             return (
-              <div
-                key={offset}
-                ref={isCenter ? cardRef : undefined}
-                className="w-[78vw] sm:w-[80vw] md:w-[82vw] max-w-6xl aspect-[16/10] sm:aspect-[21/10] md:aspect-[21/9] shrink-0 pointer-events-auto select-none relative flex items-center justify-center"
+              <motion.div
+                key={game.id}
+                initial={false}
+                animate={{
+                  x: offset * step,
+                  scale: isCenter ? 1 : 0.88,
+                  opacity: isCenter ? 1 : Math.abs(offset) === 1 ? 0.4 : 0,
+                  zIndex: isCenter ? 20 : 10 - Math.abs(offset),
+                }}
+                transition={
+                  isVisible
+                    ? { duration: 0.45, ease: [0.25, 1, 0.5, 1] }
+                    : { duration: 0 }
+                }
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  marginLeft: -cardWidth / 2,
+                  width: cardWidth,
+                  height: "100%",
+                  visibility: isVisible ? "visible" : "hidden",
+                  pointerEvents: isCenter || Math.abs(offset) === 1 ? "auto" : "none",
+                }}
+                className="flex items-center justify-center will-change-transform transform-gpu"
               >
-                <motion.div
-                  animate={getCardAnimation(offset)}
-                  whileHover={!isCenter && !isTransitioning ? { opacity: 0.75 } : undefined}
+                <div
                   onClick={() => {
-                    if (isTransitioning) return;
+                    if (isDragging.current) return;
                     if (offset === 0) onSelectGame(game);
                     else if (offset === 1) handleNext();
                     else if (offset === -1) handlePrev();
                   }}
-                  className={`relative w-full bg-black border border-white/20 rounded-md shadow-2xl overflow-hidden cursor-pointer group origin-center transition-shadow ${
-                    isCenter ? "hover:border-[#0051ff]/80" : "hover:border-white/40"
+                  className={`relative w-full h-full bg-black border border-white/20 rounded-md shadow-2xl overflow-hidden cursor-pointer group origin-center transition-all duration-300 ${
+                    isCenter
+                      ? "hover:border-[#0051ff]/80 shadow-black/80"
+                      : "hover:border-white/40 opacity-90 hover:opacity-100"
                   }`}
                   title={game.title}
                 >
-                  {/* Corner Marks */}
+                  {/* Status Mark */}
                   {isCenter && (
                     <span className="absolute top-3 right-4 font-mono text-[9px] text-white/50 select-none z-20 bg-black/60 px-2 py-0.5 border border-white/10 rounded-sm">
                       {game.released ? "LANÇADO" : "EM DESENVOLVIMENTO"}
@@ -206,7 +217,7 @@ export const ShowcaseMode = ({
                     }`}
                   />
 
-                  {/* Click Trigger Overlay */}
+                  {/* Botão de Abrir */}
                   {isCenter && (
                     <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/40">
                       <div className="px-5 py-2.5 bg-white text-black font-cyber font-bold text-xs uppercase tracking-wider hover:bg-[#0051ff] hover:text-white transition-colors flex items-center gap-2 rounded-sm shadow-xl">
@@ -215,18 +226,17 @@ export const ShowcaseMode = ({
                       </div>
                     </div>
                   )}
-                </motion.div>
-              </div>
+                </div>
+              </motion.div>
             );
           })}
-        </motion.div>
+        </div>
 
         {/* Botões de Navegação */}
         <button
           type="button"
           onClick={handlePrev}
-          disabled={isTransitioning}
-          className="absolute left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:p-3 bg-black/70 border border-white/20 hover:border-[#0051ff] text-white transition-colors flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto active:scale-95 disabled:opacity-40"
+          className="absolute left-2 sm:left-4 md:left-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 bg-black/70 border border-white/20 hover:border-[#0051ff] text-white transition-colors flex items-center justify-center shadow-2xl active:scale-95 pointer-events-auto"
           aria-label="Jogo anterior"
         >
           <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -235,8 +245,7 @@ export const ShowcaseMode = ({
         <button
           type="button"
           onClick={handleNext}
-          disabled={isTransitioning}
-          className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-20 w-10 h-10 sm:w-12 sm:p-3 bg-black/70 border border-white/20 hover:border-[#0051ff] text-white transition-colors flex items-center justify-center shadow-2xl transition-all duration-300 pointer-events-auto active:scale-95 disabled:opacity-40"
+          className="absolute right-2 sm:right-4 md:right-6 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 bg-black/70 border border-white/20 hover:border-[#0051ff] text-white transition-colors flex items-center justify-center shadow-2xl active:scale-95 pointer-events-auto"
           aria-label="Próximo jogo"
         >
           <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
@@ -284,7 +293,6 @@ export const ShowcaseMode = ({
               type="button"
               key={idx}
               onClick={() => handleDotClick(idx)}
-              disabled={isTransitioning}
               className={`h-1.5 transition-all duration-300 rounded-full ${
                 idx === currentIndex ? "w-6 bg-[#0051ff]" : "w-2 bg-white/20 hover:bg-white/40"
               }`}

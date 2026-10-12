@@ -108,17 +108,15 @@ const HeroSection = () => {
               initial={{ opacity: 0, scale: 0.85 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="relative flex items-center justify-center p-2"
+              className="relative flex items-center justify-center"
             >
-              {/* Retículas */}
-              <div className="absolute inset-0 rounded-full border border-dashed border-[#0051ff]/30 animate-[spin_60s_linear_infinite] pointer-events-none" />
-              <div className="absolute -inset-4 rounded-full border border-white/5 pointer-events-none" />
-
-              <div className="relative z-10 w-56 h-56 sm:w-64 h-64 md:w-[320px] md:h-[320px] lg:w-[350px] lg:h-[350px] flex items-center justify-center">
+              <div className="relative w-56 h-56 sm:w-64 sm:h-64 md:w-80 md:h-80 lg:w-[350px] lg:h-[350px] aspect-square flex items-center justify-center">
+                <div className="absolute inset-0 rounded-full border border-dashed border-[#0051ff]/35 animate-[spin_60s_linear_infinite] pointer-events-none" />
+                <div className="absolute -inset-3 sm:-inset-4 rounded-full border border-white/10 pointer-events-none" />
                 <img
                   src={logoMascote}
                   alt="LEDES Games Mascote"
-                  className="w-full h-full object-contain filter drop-shadow-[0_20px_50px_rgba(0,81,255,0.3)] select-none"
+                  className="w-full h-full object-contain filter drop-shadow-[0_20px_50px_rgba(0,81,255,0.3)] select-none z-10 p-2 sm:p-3"
                 />
               </div>
             </motion.div>
