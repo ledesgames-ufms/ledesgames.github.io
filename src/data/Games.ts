@@ -1,6 +1,6 @@
-import jurupariImg from '@/assets/game-jurupari.jpg';
+import jurupariImg from '@/assets/game-jurupari.webp';
 import pantanalWordImg from '@/assets/game-pantanal-word.jpg';
-import theseusImg from '@/assets/game-theseus.jpg';
+import theseusImg from '@/assets/game-theseus.webp';
 import museumImg from '@/assets/game-museum.jpg';
 import macroPlanetImg from '@/assets/game-macro-planet.jpg';
 import motoDisasterImg from '@/assets/game-moto-disaster.jpg';
@@ -12,7 +12,7 @@ export interface Game {
   longDescription: string;
   tags: string[];
   image: string;
-  videoUrl?: string;
+  videoUrl?: string | null;
   playUrl?: string;
   isFeatured?: boolean;
   released?: boolean;
@@ -106,18 +106,25 @@ export const games: Game[] = [
     released: false,
     isFeatured: false, 
     description: 'Um survival horror de exploração ambientado no vasto bioma do Pantanal.',
-    longDescription: 'Explore um Pantanal brasileiro assombrado pelo folclore local. Investigue, descubra segredos e interaja com a fauna local em uma experiência única.',
-    tags: ['Survival', 'Exploração', 'Terror', '3D'],
+    longDescription: 'Explore um Pantanal brasileiro assombrado pelo folclore local.',
+    tags: ['Sobrevivência', 'Exploração', 'Terror', '3D'],
     image: jurupariImg,
     videoUrl: null,
     playUrl: 'https://ledesgames.itch.io/pantanal3d',
     developmentDates: {
-      start: 'Janeio 2026',
+      start: 'Janeiro 2026',
       release: ''
     },
     team: [
-      { name: 'Arthur de Andrade', role: 'Desenvolvimento, Modelagem 3D, Ilustração, Animação' },
-      { name: 'Nathan Rezende', role: 'Desenvolvimento,Modelagem 3D, Ilustração, Animação' },
+      { name: 'Arthur de Andrade', role: 'Direção, Desenvolvimento, Modelagem 3D, Ilustração, Animação' },
+      { name: 'Nathan Rezende', role: 'Direção, Desenvolvimento, Modelagem 3D, Ilustração, Animação' },
+      { name: 'Miguel Albuquerque', role: 'Direção de Áudio, Composição, Sound Design' },
+      { name: 'Ana Brandão', role: 'Direção de Narrativa, Level Design, Ilustração' },
+      { name: 'Paola Vendruscolo', role: 'Direção de Arte, UI Design, Modelagem 3D' },
+      { name: 'Caio Kwiatkoski', role: 'Modelagem 3D, Composição' },
+      { name: 'João Romero', role: 'Narrativa, Composição' },
+      { name: 'Isadora Zanatta', role: 'Modelagem 3D, Ilustração' },
+      { name: 'Adam Campos', role: 'Composição' },
     ]
   },
   {
@@ -126,7 +133,7 @@ export const games: Game[] = [
     released: false,
     isFeatured: false, 
     description: 'Em breve mais informações.',
-    longDescription: 'Detalhes sobre mecânicas, história e desenvolvimento.',
+    longDescription: 'Em breve mais informações.',
     tags: ['Gerenciamento', 'Exploração'],
     image: macroPlanetImg,
     videoUrl: null,
@@ -143,7 +150,7 @@ export const games: Game[] = [
     released: false,
     isFeatured: false, 
     description: 'Em breve mais informações.',
-    longDescription: 'Detalhes sobre mecânicas, história e desenvolvimento.',
+    longDescription: 'Em breve mais informações.',
     tags: ['Moto Delivery', 'Arcade'],
     image: motoDisasterImg,
     videoUrl: null,

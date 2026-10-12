@@ -57,9 +57,6 @@ const ResearchSection = () => {
               <h2 className="font-display text-4xl sm:text-6xl uppercase tracking-wider text-[#08080A] leading-none">
                 Pesquisa & <span className="text-[#0051ff]">Publicações</span>
               </h2>
-              <p className="text-[#52525B] font-sans text-base max-w-2xl mt-3 leading-relaxed">
-                No LEDES Games, desenvolver jogos digitais e pesquisar engenharia de software caminham lado a lado. Conheça nossas contribuições para a ciência.
-              </p>
             </div>
 
             {/* Filter Pills */}
@@ -192,7 +189,7 @@ const ResearchCard = ({ publication }: { publication: Publication }) => {
         {/* Authors Roster */}
         <div className="flex-1">
           <p className="font-mono text-[10px] uppercase tracking-wider text-[#71717A] font-bold mb-1 flex items-center gap-1.5">
-            <User className="w-3.5 h-3.5 text-[#0051ff]" /> AUTORES & PESQUISADORES
+            <User className="w-3.5 h-3.5 text-[#0051ff]" /> AUTORES
           </p>
           <p className="font-sans text-sm font-medium text-[#18181B]">
             {publication.authors}

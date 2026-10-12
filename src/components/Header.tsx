@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Menu, X, ArrowUpRight } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Menu, X } from 'lucide-react';
 import logoLedes from '@/assets/logo-ledes-games.png';
 
 const Header = () => {
@@ -70,15 +69,14 @@ const Header = () => {
 
           {/* Mobile Menu Toggle Button */}
           <div className="flex lg:hidden items-center gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              className="text-white border border-white/10 hover:bg-white/[0.05] hover:border-[#0051ff] rounded-none w-10 h-10"
+            <button
+              type="button"
+              className="flex items-center justify-center text-white border border-white/10 hover:bg-white/[0.05] hover:border-[#0051ff] rounded-none w-10 h-10 transition-colors"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Abrir menu"
             >
               {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </Button>
+            </button>
           </div>
         </div>
 

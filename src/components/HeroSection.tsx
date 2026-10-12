@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowDown, Gamepad2, BookOpen, Terminal } from 'lucide-react';
-import logoMascote from '@/assets/logo-mascote.png';
+import { Gamepad2, BookOpen, ArrowDown } from 'lucide-react';
+import logoMascote from '@/assets/logo-mascote.webp';
 import team1 from '@/assets/team-1.jpg';
 import team2 from '@/assets/team-2.jpg';
 import team3 from '@/assets/team-3.jpg';

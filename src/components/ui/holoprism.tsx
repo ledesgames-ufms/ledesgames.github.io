@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, useAnimationFrame } from "framer-motion";
 
 interface HoloPrismProps {
@@ -67,8 +67,24 @@ export function HoloPrism({
   floatOffset = 12,
 }: HoloPrismProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const imageContainerRef = useRef<HTMLDivElement>(null);
   const cornerRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const [clipPathStyle, setClipPathStyle] = useState<string>("none");
+  const isVisibleRef = useRef(true);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+      },
+      { threshold: 0 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const { scrollYProgress } = useScroll();
 
@@ -81,7 +97,7 @@ export function HoloPrism({
   const halfSize = size / 2;
 
   useAnimationFrame(() => {
-    if (!image || !containerRef.current) return;
+    if (!image || !isVisibleRef.current || !containerRef.current || !imageContainerRef.current) return;
 
     const cRect = containerRef.current.getBoundingClientRect();
     if (cRect.width === 0 || cRect.height === 0) return;
@@ -102,10 +118,11 @@ export function HoloPrism({
     if (points.length === 8) {
       const hull = convexHull(points);
       if (hull.length >= 3) {
-        const polygonStr = hull
+        const polygonStr = `polygon(${hull
           .map((p) => `${p.x.toFixed(1)}px ${p.y.toFixed(1)}px`)
-          .join(", ");
-        setClipPathStyle(`polygon(${polygonStr})`);
+          .join(", ")})`;
+        imageContainerRef.current.style.clipPath = polygonStr;
+        imageContainerRef.current.style.webkitClipPath = polygonStr;
       }
     }
   });
@@ -142,11 +159,8 @@ export function HoloPrism({
       {/* CAMADA DA IMAGEM REVELADA PELA SILHUETA DO CUBO */}
       {image && (
         <div
+          ref={imageContainerRef}
           className="absolute inset-0 z-0 pointer-events-none"
-          style={{
-            clipPath: clipPathStyle,
-            WebkitClipPath: clipPathStyle,
-          }}
         >
           <img
             src={image}

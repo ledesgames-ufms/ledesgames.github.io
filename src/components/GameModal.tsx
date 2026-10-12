@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ChevronUp, ChevronDown, Gamepad2, Play, Users, X, Calendar, ExternalLink, ShieldCheck, Terminal } from "lucide-react";
+import { ChevronUp, ChevronDown, Gamepad2, Play, Users, X, Calendar, ExternalLink } from "lucide-react";
 import { Game } from "@/data/Games";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
@@ -52,7 +52,8 @@ const GameModal = ({ isOpen, onClose, game }: GameModalProps) => {
 
           {/* Modal Header Bar */}
           <div className="flex items-center justify-between px-6 py-4 bg-[#0E0E14] border-b border-white/10 shrink-0">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 font-mono text-[11px] text-[#9999A5] uppercase tracking-wider">
+              <span>DETALHES DO PROJETO</span>
             </div>
 
             <button
@@ -137,7 +138,7 @@ const GameModal = ({ isOpen, onClose, game }: GameModalProps) => {
                 {/* Description */}
                 <div className="space-y-2">
                   <span className="font-mono text-[10px] text-[#9999A5] uppercase tracking-wider block">
-                    [ VISÃO GERAL & OBJETIVOS ]
+                    VISÃO GERAL
                   </span>
                   <p className="text-sm sm:text-base font-sans text-[#D4D4D8] leading-relaxed">
                     {game.longDescription || game.description}
@@ -148,7 +149,7 @@ const GameModal = ({ isOpen, onClose, game }: GameModalProps) => {
                 <div className="pt-2 border-t border-white/10">
                   <div className="flex items-center justify-between mb-3">
                     <span className="font-mono text-[10px] text-[#9999A5] uppercase tracking-wider flex items-center gap-1.5">
-                      <Users className="w-3.5 h-3.5 text-[#0051ff]" /> CRÉDITOS & DESENVOLVIMENTO ({game.team?.length || 0})
+                      <Users className="w-3.5 h-3.5 text-[#0051ff]" /> TIME ({game.team?.length || 0})
                     </span>
                   </div>
 

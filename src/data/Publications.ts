@@ -19,5 +19,15 @@ export const publications: Publication[] = [
     date: "Maio 2025",
     type: "Artigo",
     link: "https://sol.sbc.org.br/index.php/sbsi/article/view/34347/34138"
+  },
+  {
+    id: 2,
+    title: "Transcending the Visual Labyrinth: Rethinking Action RPGs Through Art with Inclusive Sound Design for Blind People",
+    abstract: "Introduction: This work presents the development of the game Theseus' Odyssey, a digital Role-Playing Game (RPG) based on the myth of Theseus, designed to be accessible to totally blind gamers. The game’s audiovisual design and development encompass pedagogical and accessibility guidelines designed to prioritize auditory feedback as the primary channel of information. Objective: To facilitate the inclusion and strengthen the interaction of non-sighted players through the design ...",
+    authors: "Arthur Barbosa de Andrade, Nathan de Almeida Rezende, Gilvan Ferreira Alves Junior, Miguel Sobreira de Albuquerque, Caio Kwiatkoski Fiori Mendes, Lara Liz Perius, Vitor Tomaz Zan, Ricardo Theis Geraldi",
+    conference: "SBGames 2026",
+    date: "Setembro 2026",
+    type: "Artigo",
+    link: "https://sol.sbc.org.br/index.php/sbgames/article/view/45340/45101"
   }
 ];

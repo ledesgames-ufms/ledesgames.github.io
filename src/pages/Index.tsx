@@ -1,38 +1,24 @@
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
-import GameGrid from '@/components/GameGrid';
+import GamesSection from '@/components/GamesSection';
 import ResearchSection from '@/components/ResearchSection';
 import InstitutionalSection from '@/components/InstitutionalSection';
 import MediaSection from '@/components/MediaSection';
 import Footer from '@/components/Footer';
-import { ScrollColorProvider, useScrollColor } from '@/context/ScrollColorContext';
 
-const MainLayout = () => {
-  const { theme } = useScrollColor();
-  
+const Index = () => {
   return (
-    <div 
-      className="min-h-screen text-foreground font-sans transition-colors duration-1000 ease-in-out"
-      style={{ backgroundColor: theme.bg }}
-    >
+    <div className="min-h-screen bg-[#08080A] text-foreground font-sans">
       <Header />
       <main>
         <HeroSection />
-        <GameGrid />
+        <GamesSection />
         <ResearchSection />
         <InstitutionalSection />
         <MediaSection />
       </main>
       <Footer />
     </div>
-  );
-};
-
-const Index = () => {
-  return (
-    <ScrollColorProvider>
-      <MainLayout />
-    </ScrollColorProvider>
   );
 };
 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight, Lightbulb, Users, Cpu, ArrowUpRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Lightbulb, Users, Cpu, ArrowUpRight } from 'lucide-react';
 import team1 from '@/assets/team-1.jpg';
 import team2 from '@/assets/team-2.jpg';
 import team3 from '@/assets/team-3.jpg';
@@ -55,7 +55,7 @@ const pillars = [
     id: '03',
     icon: Cpu,
     title: 'Engenharia & Ferramentas',
-    description: 'Domínio de game engines, pipelines ágeis e boas práticas para entregar jogos de alta qualidade.',
+    description: 'Domínio de game engines, pipelines ágeis e boas práticas da engenharia de software para entregar bons jogos à sociedade.',
   },
 ];
 

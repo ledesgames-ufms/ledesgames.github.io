@@ -1,7 +1,7 @@
 import { type CSSProperties } from 'react';
 import { motion } from 'framer-motion';
-import { Mail, MapPin, Instagram, Youtube, Radio, ArrowUpRight } from 'lucide-react';
-import { useScrollColor } from '@/context/ScrollColorContext';
+import { Mail, MapPin, Instagram, Youtube, ArrowUpRight } from 'lucide-react';
+import { THEME } from '@/constants/theme';
 
 const mediaCards = [
   {
@@ -47,11 +47,14 @@ const mediaCards = [
 ];
 
 const MediaSection = () => {
-  const { theme } = useScrollColor();
-  const sectionStyle = { "--accent": theme.accent } as CSSProperties;
+  const theme = THEME.sections.media;
+  const sectionStyle = {
+    "--accent": theme.accent,
+    backgroundColor: theme.bg,
+  } as CSSProperties;
 
   return (
-    <section id="media" style={sectionStyle} className="relative py-20 lg:py-24 bg-[#07070B] transition-colors duration-1000 overflow-hidden">
+    <section id="media" style={sectionStyle} className="relative py-20 lg:py-24 transition-colors duration-1000 overflow-hidden">
       
       <div className="absolute top-0 left-0 w-full h-[1px] opacity-30 transition-colors duration-1000" style={{ background: `linear-gradient(to right, transparent, var(--accent), transparent)` }} />
 
