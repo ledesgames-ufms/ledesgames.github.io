@@ -25,9 +25,9 @@ const teamPhotos: TeamPhoto[] = [
   {
     id: 'photo-2',
     src: team2,
-    title: 'Premiação no Simpósio SBGames',
+    title: 'Premiação na Intercom',
     date: 'Maio de 2025',
-    description: 'Participação e premiação da equipe no simpósio SBGames.',
+    description: 'Participação e premiação na Intercom Centro-Oeste 2025.',
   },
   {
     id: 'photo-3',
@@ -97,7 +97,7 @@ const InstitutionalSection = () => {
           </motion.div>
         </AnimatePresence>
 
-        {/* Dynamic Vignette and Gradient Overlay */}
+        {/* Vignette and Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#08080A] via-[#08080A]/40 to-black/60 pointer-events-none" />
 
         {/* Top Header Information Overlay */}
